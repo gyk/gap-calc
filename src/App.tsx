@@ -6,36 +6,58 @@ import { UnitSelector } from "./components/UnitSelector";
 import { useGapStore } from "./store/useGapStore";
 import type {
   CalcMode,
-  HillDirection,
   HillInputMode,
   PaceUnit,
-  SpeedMode,
+  UnitSystem,
 } from "./types/gap";
 
 export default function App() {
   const {
-    speedMode,
+    unitSystem,
     paceInput,
     speedInput,
     inputUnit,
     calcMode,
-    hillDirection,
     hillInputMode,
     outputUnit,
-    setSpeedMode,
     setPaceInput,
     setSpeedInput,
     setInputUnit,
     setCalcMode,
-    setHillDirection,
     setHillInputMode,
     setOutputUnit,
+    setUnitSystem,
   } = useGapStore();
+
+  // Determine speedMode based on inputUnit
+  const speedMode =
+    inputUnit === "mph" || inputUnit === "km/h" ? "speed" : "pace";
+
+  // Get filtered unit options based on unit system
+  const getInputUnitOptions = (): PaceUnit[] => {
+    if (unitSystem === "metric") return ["/km", "km/h"];
+    if (unitSystem === "imperial") return ["/mi", "mph"];
+    return ["/mi", "/km", "mph", "km/h"];
+  };
+
+  const getOutputUnitOptions = (): PaceUnit[] => {
+    if (unitSystem === "metric") return ["/km", "km/h"];
+    if (unitSystem === "imperial") return ["/mi", "mph"];
+    return ["/mi", "/km", "mph", "km/h"];
+  };
 
   return (
     <html.div style={styles.container}>
       <html.div style={styles.card}>
         <html.h1 style={styles.title}>GAP Calculator</html.h1>
+
+        {/* Unit System Selector */}
+        <UnitSelector<UnitSystem>
+          label="Unit System"
+          options={["metric", "imperial", "both"]}
+          value={unitSystem}
+          onChange={setUnitSystem}
+        />
 
         {/* Calculation Mode */}
         <UnitSelector<CalcMode>
@@ -47,15 +69,12 @@ export default function App() {
 
         {/* Speed/Pace Input Section */}
         <html.div style={styles.section}>
-          <html.div style={styles.sectionHeader}>
-            <html.div style={styles.sectionTitle}>
-              {calcMode === "pace" ? "Flat Pace/Speed" : "Target Effort (Flat)"}
-            </html.div>
-            <UnitSelector<SpeedMode>
-              options={["pace", "speed"]}
-              value={speedMode}
-              onChange={setSpeedMode}
-            />
+          <html.div style={styles.sectionTitle}>
+            {calcMode === "pace"
+              ? inputUnit === "mph" || inputUnit === "km/h"
+                ? "Flat Speed"
+                : "Flat Pace"
+              : "Target Effort (Flat)"}
           </html.div>
 
           <html.div style={styles.inputRow}>
@@ -152,7 +171,7 @@ export default function App() {
               </>
             )}
             <UnitSelector<PaceUnit>
-              options={["/mi", "/km", "mph", "km/h"]}
+              options={getInputUnitOptions()}
               value={inputUnit}
               onChange={setInputUnit}
             />
@@ -161,14 +180,7 @@ export default function App() {
 
         {/* Hill Section */}
         <html.div style={styles.section}>
-          <html.div style={styles.sectionHeader}>
-            <html.div style={styles.sectionTitle}>Hill Settings</html.div>
-            <UnitSelector<HillDirection>
-              options={["uphill", "downhill"]}
-              value={hillDirection}
-              onChange={setHillDirection}
-            />
-          </html.div>
+          <html.div style={styles.sectionTitle}>Hill Settings</html.div>
 
           <UnitSelector<HillInputMode>
             options={["grade", "angle", "rise/run", "vert speed"]}
@@ -184,7 +196,7 @@ export default function App() {
           <html.div style={styles.sectionHeader}>
             <html.div style={styles.sectionTitle}>Output Unit</html.div>
             <UnitSelector<PaceUnit>
-              options={["/mi", "/km", "mph", "km/h"]}
+              options={getOutputUnitOptions()}
               value={outputUnit}
               onChange={setOutputUnit}
             />

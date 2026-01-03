@@ -11,6 +11,9 @@ export type SpeedMode = "pace" | "speed";
 /** Calculation mode - pace-to-effort or effort-to-pace */
 export type CalcMode = "pace" | "effort";
 
+/** Unit system preference */
+export type UnitSystem = "metric" | "imperial" | "both";
+
 /** Hill direction */
 export type HillDirection = "uphill" | "downhill";
 
@@ -75,6 +78,9 @@ export interface VertSpeedInput {
 
 /** Calculator state */
 export interface GapState {
+  // Unit system preference
+  unitSystem: UnitSystem;
+
   // Speed/pace input
   speedMode: SpeedMode;
   paceInput: PaceInput;

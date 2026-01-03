@@ -80,22 +80,29 @@ export function OutputDisplay() {
   const displayGrade = (resultGrade * 100).toFixed(1);
 
   return (
-    <html.div style={styles.container}>
-      <html.div style={styles.label}>
-        {state.calcMode === "pace"
-          ? "Grade-Adjusted Pace"
-          : "Equivalent Hill Pace"}
+    <html.div style={styles.wrapper}>
+      <html.div style={styles.container}>
+        <html.div style={styles.label}>
+          {state.calcMode === "pace"
+            ? "Grade-Adjusted Pace"
+            : "Equivalent Hill Pace"}
+        </html.div>
+        <html.div style={styles.value}>
+          {formattedOutput}
+          <html.span style={styles.unit}>{state.outputUnit}</html.span>
+        </html.div>
+        <html.div style={styles.subtext}>at {displayGrade}% grade</html.div>
       </html.div>
-      <html.div style={styles.value}>
-        {formattedOutput}
-        <html.span style={styles.unit}>{state.outputUnit}</html.span>
-      </html.div>
-      <html.div style={styles.subtext}>at {displayGrade}% grade</html.div>
     </html.div>
   );
 }
 
 const styles = css.create({
+  wrapper: {
+    display: "flex",
+    justifyContent: "center",
+    width: "100%",
+  },
   container: {
     display: "flex",
     flexDirection: "column",
