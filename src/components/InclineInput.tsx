@@ -8,6 +8,7 @@ import { UnitSelector } from "./UnitSelector";
 
 export function InclineInput() {
   const {
+    unitSystem,
     hillInputMode,
     gradeInput,
     angleInput,
@@ -18,6 +19,25 @@ export function InclineInput() {
     setRiseRunInput,
     setVertSpeedInput,
   } = useGapStore();
+
+  // Get filtered unit options based on unit system
+  const getRiseUnitOptions = (): RiseUnit[] => {
+    if (unitSystem === "metric") return ["meters"];
+    if (unitSystem === "imperial") return ["feet"];
+    return ["feet", "meters"];
+  };
+
+  const getRunUnitOptions = (): RunUnit[] => {
+    if (unitSystem === "metric") return ["km"];
+    if (unitSystem === "imperial") return ["mi"];
+    return ["mi", "km"];
+  };
+
+  const getVertSpeedUnitOptions = (): VertSpeedUnit[] => {
+    if (unitSystem === "metric") return ["m/hr"];
+    if (unitSystem === "imperial") return ["ft/hr"];
+    return ["ft/hr", "m/hr"];
+  };
 
   // Determine if uphill based on current input mode
   let isUphill = true;
@@ -87,7 +107,7 @@ export function InclineInput() {
               }
             />
             <UnitSelector<RiseUnit>
-              options={["feet", "meters"]}
+              options={getRiseUnitOptions()}
               value={riseRunInput.riseUnit}
               onChange={(unit) =>
                 setRiseRunInput(
@@ -121,7 +141,7 @@ export function InclineInput() {
               }
             />
             <UnitSelector<RunUnit>
-              options={["mi", "km"]}
+              options={getRunUnitOptions()}
               value={riseRunInput.runUnit}
               onChange={(unit) =>
                 setRiseRunInput(
@@ -151,12 +171,12 @@ export function InclineInput() {
             setVertSpeedInput(vertSpeedInput.value - 50, vertSpeedInput.unit)
           }
         />
+        <UnitSelector<VertSpeedUnit>
+          options={getVertSpeedUnitOptions()}
+          value={vertSpeedInput.unit}
+          onChange={(unit) => setVertSpeedInput(vertSpeedInput.value, unit)}
+        />
       </html.div>
-      <UnitSelector<VertSpeedUnit>
-        options={["ft/hr", "m/hr"]}
-        value={vertSpeedInput.unit}
-        onChange={(unit) => setVertSpeedInput(vertSpeedInput.value, unit)}
-      />
     </html.div>
   );
 

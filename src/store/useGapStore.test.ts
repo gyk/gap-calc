@@ -28,4 +28,26 @@ describe("useGapStore", () => {
     setGradeInput(10);
     expect(useGapStore.getState().gradeInput.percent).toBe(10);
   });
+
+  it("should update unit system and related units", () => {
+    const { setUnitSystem } = useGapStore.getState();
+
+    setUnitSystem("imperial");
+    let state = useGapStore.getState();
+    expect(state.unitSystem).toBe("imperial");
+    expect(state.inputUnit).toBe("/mi");
+    expect(state.outputUnit).toBe("mph");
+    expect(state.riseRunInput.riseUnit).toBe("feet");
+    expect(state.riseRunInput.runUnit).toBe("mi");
+    expect(state.vertSpeedInput.unit).toBe("ft/hr");
+
+    setUnitSystem("metric");
+    state = useGapStore.getState();
+    expect(state.unitSystem).toBe("metric");
+    expect(state.inputUnit).toBe("/km");
+    expect(state.outputUnit).toBe("km/h");
+    expect(state.riseRunInput.riseUnit).toBe("meters");
+    expect(state.riseRunInput.runUnit).toBe("km");
+    expect(state.vertSpeedInput.unit).toBe("m/hr");
+  });
 });

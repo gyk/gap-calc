@@ -45,8 +45,8 @@ const initialState: GapState = {
   hillInputMode: "grade",
   gradeInput: { percent: 5 },
   angleInput: { degrees: 2.86 },
-  riseRunInput: { rise: 264, run: 1, riseUnit: "feet", runUnit: "mi" },
-  vertSpeedInput: { value: 1000, unit: "ft/hr" },
+  riseRunInput: { rise: 50, run: 1, riseUnit: "meters", runUnit: "km" },
+  vertSpeedInput: { value: 300, unit: "m/hr" },
   outputUnit: "km/h",
 };
 
