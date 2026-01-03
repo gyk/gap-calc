@@ -1,0 +1,111 @@
+/**
+ * Types and interfaces for the Grade-Adjusted Pace (GAP) Calculator
+ */
+
+/** Speed/pace unit options for input and output */
+export type PaceUnit = '/mi' | '/km' | 'mph' | 'km/h' | 'm/s';
+
+/** Mode for entering speed - either pace (mm:ss) or speed (decimal) */
+export type SpeedMode = 'pace' | 'speed';
+
+/** Calculation mode - pace-to-effort or effort-to-pace */
+export type CalcMode = 'pace' | 'effort';
+
+/** Hill direction */
+export type HillDirection = 'uphill' | 'downhill';
+
+/** Hill input mode - how the incline is specified */
+export type HillInputMode = 'grade' | 'angle' | 'rise/run' | 'vert speed';
+
+/** Rise unit for rise/run mode */
+export type RiseUnit = 'feet' | 'meters';
+
+/** Run unit for rise/run mode */
+export type RunUnit = 'mi' | 'km';
+
+/** Vert speed unit */
+export type VertSpeedUnit = 'ft/hr' | 'm/hr';
+
+/** Black et al 2018 GAM data structure */
+export interface BlackGamData {
+  speed_m_s: readonly number[];
+  energy_j_kg_m: readonly number[];
+  energy_j_kg_s: readonly number[];
+}
+
+/** Energy column names for lookup */
+export type EnergyColumn = 'energy_j_kg_m' | 'energy_j_kg_s';
+
+/** Pace input state (mm:ss format) */
+export interface PaceInput {
+  minutes: number;
+  tensSeconds: number;
+  onesSeconds: number;
+}
+
+/** Speed input state (decimal format) */
+export interface SpeedInput {
+  whole: number;
+  decimal: number;
+}
+
+/** Grade input state */
+export interface GradeInput {
+  percent: number;
+}
+
+/** Angle input state */
+export interface AngleInput {
+  degrees: number;
+}
+
+/** Rise/Run input state */
+export interface RiseRunInput {
+  rise: number;
+  run: number;
+  riseUnit: RiseUnit;
+  runUnit: RunUnit;
+}
+
+/** Vert speed input state */
+export interface VertSpeedInput {
+  value: number;
+  unit: VertSpeedUnit;
+}
+
+/** Calculator state */
+export interface GapState {
+  // Speed/pace input
+  speedMode: SpeedMode;
+  paceInput: PaceInput;
+  speedInput: SpeedInput;
+  inputUnit: PaceUnit;
+
+  // Calculation mode
+  calcMode: CalcMode;
+
+  // Hill settings
+  hillDirection: HillDirection;
+  hillInputMode: HillInputMode;
+  gradeInput: GradeInput;
+  angleInput: AngleInput;
+  riseRunInput: RiseRunInput;
+  vertSpeedInput: VertSpeedInput;
+
+  // Output settings
+  outputUnit: PaceUnit;
+}
+
+/** Result of GAP calculation */
+export interface GapResult {
+  /** Equivalent flat speed in m/s */
+  equivalentSpeed: number;
+  /** Formatted output string */
+  formattedOutput: string;
+  /** Whether the calculation is valid */
+  isValid: boolean;
+  /** Alert message, if any */
+  alertMessage?: string;
+  /** Info message, if any */
+  infoMessage?: string;
+}
