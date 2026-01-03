@@ -33,7 +33,7 @@ export function GradeArrowButtons({
         style={styles.button}
         aria-label={`Decrease grade by ${smallStep}`}
       >
-        ‹
+        ﹤
       </html.button>
       <html.div style={styles.display}>
         <html.div style={styles.label}>Grade</html.div>
@@ -44,7 +44,7 @@ export function GradeArrowButtons({
         style={styles.button}
         aria-label={`Increase grade by ${smallStep}`}
       >
-        ›
+        ﹥
       </html.button>
       <html.button
         onClick={onLargeIncrement}
@@ -83,8 +83,12 @@ const styles = css.create({
     fontWeight: "700",
     cursor: "pointer",
     display: "flex",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    padding: 0,
+    paddingBottom: "2px",
+    lineHeight: 1,
     transition: "all 0.2s ease",
     ":hover": {
       backgroundColor: "#bde2ff",

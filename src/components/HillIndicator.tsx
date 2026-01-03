@@ -5,31 +5,31 @@ interface HillIndicatorProps {
 }
 
 export function HillIndicator({ isUphill }: HillIndicatorProps) {
+  // <svg> element is not currently supported on native.
+  // See https://github.com/facebook/react-strict-dom/issues/4
   return (
     <html.div style={styles.container}>
       <svg
         viewBox="0 0 100 80"
         style={styles.svg}
+        role="img"
         aria-label={isUphill ? "Uphill" : "Downhill"}
       >
+        <title>{isUphill ? "Uphill" : "Downhill"}</title>
         {isUphill ? (
           // Uphill mountain
           <polyline
-            points="10,70 35,30 50,45 70,15 90,70"
+            points="10,70 35,30 50,45 70,15 90,60"
             stroke="#0056b3"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            strokeWidth="10"
             fill="none"
           />
         ) : (
           // Downhill mountain (flipped)
           <polyline
-            points="10,15 30,45 45,30 70,70 90,70"
+            points="10,15 30,45 45,35 60,60 80,60"
             stroke="#0056b3"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            strokeWidth="8"
             fill="none"
           />
         )}
@@ -47,12 +47,15 @@ const styles = css.create({
     flexDirection: "column",
     alignItems: "center",
     gap: "4px",
+    width: "56px",
   },
   svg: {
-    width: "48px",
+    width: "40px",
     height: "40px",
   },
   label: {
+    width: "100%",
+    textAlign: "center",
     fontSize: "0.75rem",
     color: "#0056b3",
     fontWeight: "600",

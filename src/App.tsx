@@ -49,7 +49,10 @@ export default function App() {
   return (
     <html.div style={styles.container}>
       <html.div style={styles.card}>
-        <html.h1 style={styles.title}>Grade-adjusted pace calculator</html.h1>
+        <html.h1 style={styles.title}>
+          <html.span style={styles.titleGrade}>Grade-adjusted</html.span> pace
+          calculator
+        </html.h1>
 
         {/* Unit System Selector */}
         <UnitSelector<UnitSystem>
@@ -180,7 +183,7 @@ export default function App() {
 
         {/* Hill Section */}
         <html.div style={styles.section}>
-          <html.div style={styles.sectionTitle}>Hill Settings</html.div>
+          <html.div style={styles.sectionTitle}>Incline</html.div>
 
           <UnitSelector<HillInputMode>
             options={["grade", "angle", "rise/run", "vert speed"]}
@@ -222,7 +225,7 @@ const styles = css.create({
     borderRadius: "24px",
     padding: "32px",
     width: "100%",
-    maxWidth: "500px",
+    maxWidth: "540px",
     boxShadow:
       "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
   },
@@ -232,6 +235,13 @@ const styles = css.create({
     color: "#0f172a",
     marginBottom: "24px",
     textAlign: "center",
+  },
+  titleGrade: {
+    transform: "rotate(-3deg)",
+    textDecoration: "underline",
+    textDecorationColor: "#5f5f5f",
+    textDecorationStyle: "double",
+    display: "inline-block",
   },
   section: {
     marginTop: "24px",

@@ -69,6 +69,7 @@ const styles = css.create({
     textAlign: "center",
     transition: "all 0.2s ease",
     minWidth: "50px",
+    whiteSpace: "nowrap",
   },
   activeButton: {
     backgroundColor: "#007bff",

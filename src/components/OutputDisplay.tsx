@@ -112,7 +112,7 @@ const styles = css.create({
     borderRadius: "16px",
     marginTop: "24px",
     width: "100%",
-    maxWidth: "400px",
+    maxWidth: "440px",
     boxShadow:
       "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
   },
