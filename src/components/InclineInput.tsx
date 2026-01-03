@@ -34,12 +34,12 @@ export function InclineInput() {
       <HillIndicator isUphill={isUphill} />
       <GradeArrowButtons
         value={gradeInput.percent}
-        onSmallIncrement={() => setGradeInput(gradeInput.percent + 0.1)}
-        onSmallDecrement={() => setGradeInput(gradeInput.percent - 0.1)}
-        onLargeIncrement={() => setGradeInput(gradeInput.percent + 1)}
-        onLargeDecrement={() => setGradeInput(gradeInput.percent - 1)}
-        smallStep={0.1}
-        largeStep={1}
+        onSmallIncrement={() => setGradeInput(gradeInput.percent + 1)}
+        onSmallDecrement={() => setGradeInput(gradeInput.percent - 1)}
+        onLargeIncrement={() => setGradeInput(gradeInput.percent + 3)}
+        onLargeDecrement={() => setGradeInput(gradeInput.percent - 3)}
+        smallStep={1}
+        largeStep={3}
       />
     </html.div>
   );

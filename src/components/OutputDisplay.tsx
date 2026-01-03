@@ -77,7 +77,7 @@ export function OutputDisplay() {
     ? convertDict[state.outputUnit](resultSpeed)
     : "---";
 
-  const displayGrade = (resultGrade * 100).toFixed(1);
+  const displayGrade = (resultGrade * 100).toFixed(0);
 
   return (
     <html.div style={styles.wrapper}>

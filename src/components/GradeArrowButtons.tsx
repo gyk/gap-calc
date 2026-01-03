@@ -16,8 +16,8 @@ export function GradeArrowButtons({
   onSmallDecrement,
   onLargeIncrement,
   onLargeDecrement,
-  smallStep = 0.1,
-  largeStep = 1,
+  smallStep = 1,
+  largeStep = 3,
 }: GradeArrowButtonsProps) {
   return (
     <html.div style={styles.container}>
@@ -37,7 +37,7 @@ export function GradeArrowButtons({
       </html.button>
       <html.div style={styles.display}>
         <html.div style={styles.label}>Grade</html.div>
-        <html.div style={styles.value}>{value.toFixed(1)}%</html.div>
+        <html.div style={styles.value}>{value.toFixed(0)}%</html.div>
       </html.div>
       <html.button
         onClick={onSmallIncrement}
