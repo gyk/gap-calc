@@ -1,2 +1,4 @@
 gap-app/
 react-strict-dom-vite-app/
+
+node_modules/

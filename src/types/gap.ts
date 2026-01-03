@@ -3,28 +3,28 @@
  */
 
 /** Speed/pace unit options for input and output */
-export type PaceUnit = '/mi' | '/km' | 'mph' | 'km/h' | 'm/s';
+export type PaceUnit = "/mi" | "/km" | "mph" | "km/h" | "m/s";
 
 /** Mode for entering speed - either pace (mm:ss) or speed (decimal) */
-export type SpeedMode = 'pace' | 'speed';
+export type SpeedMode = "pace" | "speed";
 
 /** Calculation mode - pace-to-effort or effort-to-pace */
-export type CalcMode = 'pace' | 'effort';
+export type CalcMode = "pace" | "effort";
 
 /** Hill direction */
-export type HillDirection = 'uphill' | 'downhill';
+export type HillDirection = "uphill" | "downhill";
 
 /** Hill input mode - how the incline is specified */
-export type HillInputMode = 'grade' | 'angle' | 'rise/run' | 'vert speed';
+export type HillInputMode = "grade" | "angle" | "rise/run" | "vert speed";
 
 /** Rise unit for rise/run mode */
-export type RiseUnit = 'feet' | 'meters';
+export type RiseUnit = "feet" | "meters";
 
 /** Run unit for rise/run mode */
-export type RunUnit = 'mi' | 'km';
+export type RunUnit = "mi" | "km";
 
 /** Vert speed unit */
-export type VertSpeedUnit = 'ft/hr' | 'm/hr';
+export type VertSpeedUnit = "ft/hr" | "m/hr";
 
 /** Black et al 2018 GAM data structure */
 export interface BlackGamData {
@@ -34,7 +34,7 @@ export interface BlackGamData {
 }
 
 /** Energy column names for lookup */
-export type EnergyColumn = 'energy_j_kg_m' | 'energy_j_kg_s';
+export type EnergyColumn = "energy_j_kg_m" | "energy_j_kg_s";
 
 /** Pace input state (mm:ss format) */
 export interface PaceInput {
