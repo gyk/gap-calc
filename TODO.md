@@ -1,43 +1,33 @@
-# Project Plan: gap-calc Reimplementation
+# Project Plan: gap-calc UI Improvements
 
-## Phase 1: Project Initialization and Setup
-- [x] Initialize the project structure using Vite, React, and React Strict DOM.
-- [x] Configure Tailwind CSS and Biome for styling and linting.
-- [x] Set up `pnpm` as the package manager.
-- [x] Define scripts in `package.json` for building, testing, and linting.
+- [ ] In the "Flat Pace/Speed" section, there is a selector for "Pace" vs. "Speed", but the input
+    has four modes: "/km", "/mi", "km/h", "mph". So the selector for "Pace" vs. "Speed" is redundant
+    and confusing. Consider removing it and just using the four input modes, and displays "Flat
+    Pace"  or "Flat Speed" accordingly.
+- [ ] In the "Hill Settings", there is a selector for "uphill" vs. "downhill". But when setting the
+    grade to negative, it automatically means downhill. So the selector is redundant and confusing.
+    Consider removing it, and use the image indicator is original gap-app to indicate uphill vs.
+    downhill.
 
-## Phase 2: Core Logic Porting
-- [x] Port `black_gam.js` to TypeScript (`src/logic/blackGam.ts`).
-- [x] Port `gap_logic.js` to TypeScript (`src/logic/gapLogic.ts`).
-- [x] Ensure all mathematical functions are correctly typed and tested.
+    ```html
+    <button class="material-symbols-outlined hill-button" title="Uphill or downhill" aria-label="Toggle uphill or downhill">
+    elevation
+    </button>
+    <button class="material-symbols-outlined hill-button mirrored" title="Uphill or downhill" aria-label="Toggle uphill or downhill">
+    elevation
+    </button>
+    ```
 
-## Phase 3: State Management
-- [x] Implement a Zustand store (`src/store/useGapStore.ts`) to manage:
-    - Input modes (pace vs. speed, grade vs. angle, etc.).
-    - Input values (minutes, seconds, grade percentage, etc.).
-    - Units (mi, km, mph, km/h, etc.).
-    - Calculation results.
+    But we don't use material icons in this project, so we need to find another way to do it (SVG or
+    other clever ways).
+- [ ] In the original app, the grade UI is like, where `<<` `<` `>` `>>` are circle buttons:
 
-## Phase 4: UI Component Development
-- [x] Create `DigitDial` component for numeric inputs with increment/decrement buttons.
-- [x] Create `UnitSelector` component for switching between different units.
-- [x] Create `ModeSwitcher` for toggling between calculation and hill modes.
-- [x] Create `InclineInput` for handling various hill input methods.
-- [x] Create `OutputDisplay` to show the calculated GAP or equivalent effort.
+    ```
+    << <     Grade: 5%     > >>
+    ```
 
-## Phase 5: Application Assembly and Integration
-- [x] Build the main `App.tsx` layout.
-- [x] Integrate UI components with the Zustand store.
-- [x] Connect the GAP logic to the state updates for real-time calculations.
-
-## Phase 6: Styling and Polish
-- [x] Apply modern, responsive styling using Tailwind CSS and React Strict DOM.
-- [x] Ensure accessibility and a clean user interface.
-
-## Phase 7: Testing and Validation
-- [x] Port existing tests from `gap-app/tests.mjs` to Vitest.
-- [x] Add unit tests for new components and state management logic.
-
-## Phase 8: Final Review
-- [x] Run Biome for linting and formatting.
-- [x] Perform a final walkthrough of the application to ensure all features are implemented correctly.
+    It allows users to click the arrows to increment/decrement the grade value, either using small
+    or large steps. Consider implementing a similar UI, or use a slider.
+- [ ] The output "Grade-Adjusted Pace" card in not horizontally centered.
+- [ ] Consider adding an option to switch between Metric / Imperial / Both units for all inputs and
+  outputs. Make metric the default. Make "km/h" the default output unit.
