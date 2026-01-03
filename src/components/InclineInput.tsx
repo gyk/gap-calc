@@ -173,10 +173,10 @@ export function InclineInput() {
 const styles = css.create({
   container: {
     padding: "16px",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#f0f7ff",
     borderRadius: "12px",
     borderWidth: "1px",
-    borderColor: "#e5e7eb",
+    borderColor: "#bde2ff",
     marginTop: "12px",
   },
   row: {

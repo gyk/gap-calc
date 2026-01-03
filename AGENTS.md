@@ -1,5 +1,7 @@
 # gap-calc
 
+NOTE: We use `pnpm`, not `npm`.
+
 This project aims to reimplement _grade-adjusted pace calculator_ from Running Writings Apps in modern tech stack:
 
 - TypeScript (and Zod if needed)

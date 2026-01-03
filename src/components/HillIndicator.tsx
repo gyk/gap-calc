@@ -16,7 +16,7 @@ export function HillIndicator({ isUphill }: HillIndicatorProps) {
           // Uphill mountain
           <polyline
             points="10,70 35,30 50,45 70,15 90,70"
-            stroke="#334155"
+            stroke="#0056b3"
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -26,7 +26,7 @@ export function HillIndicator({ isUphill }: HillIndicatorProps) {
           // Downhill mountain (flipped)
           <polyline
             points="10,15 30,45 45,30 70,70 90,70"
-            stroke="#334155"
+            stroke="#0056b3"
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -54,7 +54,8 @@ const styles = css.create({
   },
   label: {
     fontSize: "0.75rem",
-    color: "#6b7280",
-    fontWeight: "500",
+    color: "#0056b3",
+    fontWeight: "600",
+    textTransform: "uppercase",
   },
 });

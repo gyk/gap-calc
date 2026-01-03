@@ -49,7 +49,7 @@ export default function App() {
   return (
     <html.div style={styles.container}>
       <html.div style={styles.card}>
-        <html.h1 style={styles.title}>GAP Calculator</html.h1>
+        <html.h1 style={styles.title}>Grade-adjusted pace calculator</html.h1>
 
         {/* Unit System Selector */}
         <UnitSelector<UnitSystem>
@@ -247,21 +247,23 @@ const styles = css.create({
     marginBottom: "16px",
   },
   sectionTitle: {
-    fontSize: "1rem",
+    fontSize: "1.1rem",
     fontWeight: "700",
-    color: "#334155",
+    color: "#0056b3",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px",
   },
   inputRow: {
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: "8px",
+    gap: "12px",
   },
   separator: {
     fontSize: "1.5rem",
     fontWeight: "bold",
-    color: "#64748b",
+    color: "#007bff",
     paddingTop: "20px",
   },
 });
