@@ -30,6 +30,7 @@ This project aims to reimplement _grade-adjusted pace calculator_ from Running W
 
 ## Steps to Reimplement gap-app
 
+- Use `TODO.md` as a guide for the project plan. Tick off each item as you complete them.
 - Extract self-contained UI components, e.g.,
     ```jsx
     // You would write this once and use it for minutes, seconds, etc.
