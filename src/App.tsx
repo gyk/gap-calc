@@ -1,4 +1,4 @@
-import { html } from "react-strict-dom";
+import { css, html } from "react-strict-dom";
 import { DigitDial } from "./components/DigitDial";
 import { InclineInput } from "./components/InclineInput";
 import { OutputDisplay } from "./components/OutputDisplay";
@@ -196,7 +196,7 @@ export default function App() {
   );
 }
 
-const styles = {
+const styles = css.create({
   container: {
     display: "flex",
     flexDirection: "column",
@@ -252,4 +252,4 @@ const styles = {
     color: "#64748b",
     paddingTop: "20px",
   },
-} as const;
+});

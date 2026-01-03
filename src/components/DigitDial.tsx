@@ -1,4 +1,4 @@
-import { html } from "react-strict-dom";
+import { css, html } from "react-strict-dom";
 
 interface DigitDialProps {
   value: number | string;
@@ -37,7 +37,7 @@ export function DigitDial({
   );
 }
 
-const styles = {
+const styles = css.create({
   container: {
     display: "flex",
     flexDirection: "column",
@@ -79,4 +79,4 @@ const styles = {
     minWidth: "1.5rem",
     textAlign: "center",
   },
-} as const;
+});

@@ -1,4 +1,4 @@
-import { html } from "react-strict-dom";
+import { css, html } from "react-strict-dom";
 import {
   calculateGradeFromRiseRun,
   calculateMainResult,
@@ -95,7 +95,7 @@ export function OutputDisplay() {
   );
 }
 
-const styles = {
+const styles = css.create({
   container: {
     display: "flex",
     flexDirection: "column",
@@ -135,4 +135,4 @@ const styles = {
     color: "#94a3b8",
     marginTop: "8px",
   },
-} as const;
+});

@@ -1,4 +1,4 @@
-import { html } from "react-strict-dom";
+import { css, html } from "react-strict-dom";
 
 interface UnitSelectorProps<T extends string> {
   options: T[];
@@ -31,7 +31,7 @@ export function UnitSelector<T extends string>({
   );
 }
 
-const styles = {
+const styles = css.create({
   container: {
     display: "flex",
     flexDirection: "column",
@@ -68,4 +68,4 @@ const styles = {
     boxShadow:
       "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
   },
-} as const;
+});

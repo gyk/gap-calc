@@ -1,4 +1,4 @@
-import { html } from "react-strict-dom";
+import { css, html } from "react-strict-dom";
 import { useGapStore } from "../store/useGapStore";
 import type { RiseUnit, RunUnit, VertSpeedUnit } from "../types/gap";
 import { DigitDial } from "./DigitDial";
@@ -148,7 +148,7 @@ export function InclineInput() {
   );
 }
 
-const styles = {
+const styles = css.create({
   container: {
     padding: "16px",
     backgroundColor: "#ffffff",
@@ -170,4 +170,4 @@ const styles = {
     flexDirection: "column",
     gap: "12px",
   },
-} as const;
+});
