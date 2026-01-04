@@ -37,6 +37,7 @@ interface GapActions {
   ) => void;
   setVertSpeedInput: (value: number, unit: VertSpeedUnit) => void;
   setOutputUnit: (unit: PaceUnit) => void;
+  applyPreset: (inclinePercent: number, speedMph: number) => void;
   reset: () => void;
 }
 
@@ -384,6 +385,32 @@ export const useGapStore = create<GapState & GapActions>()(
     setOutputUnit: (unit) =>
       set((state) => {
         state.outputUnit = unit;
+      }),
+    applyPreset: (inclinePercent, speedMph) =>
+      set((state) => {
+        // Set grade
+        const grade = inclinePercent / 100;
+        state.grade = grade;
+        updateHillInputsFromGrade(state);
+
+        // Set speed
+        // If current unit system is metric, convert speedMph to km/h
+        let targetSpeed = speedMph;
+        let targetUnit: PaceUnit = "mph";
+
+        if (state.unitSystem === "metric") {
+          targetSpeed = speedMph * 1.609344;
+          targetUnit = "km/h";
+        }
+
+        // Update input unit to speed-based if it wasn't
+        state.inputUnit = targetUnit;
+
+        const totalTenths = Math.round(targetSpeed * 10);
+        state.speedInput.whole = Math.floor(totalTenths / 10);
+        state.speedInput.decimal = totalTenths % 10;
+
+        syncVertSpeedFromGrade(state);
       }),
     reset: () =>
       set((state) => {

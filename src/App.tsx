@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { css, html } from "react-strict-dom";
 import { DigitDial } from "./components/DigitDial";
 import { InclineInput } from "./components/InclineInput";
 import { OutputDisplay } from "./components/OutputDisplay";
+import { PresetsModal } from "./components/PresetsModal";
 import { UnitSelector } from "./components/UnitSelector";
 import { useGapStore } from "./store/useGapStore";
 import type {
@@ -45,6 +47,8 @@ export default function App() {
     setOutputUnit,
     setUnitSystem,
   } = useGapStore();
+
+  const [isPresetsOpen, setIsPresetsOpen] = useState(false);
 
   // Determine speedMode based on inputUnit
   const speedMode =
@@ -98,7 +102,6 @@ export default function App() {
           <html.span style={styles.titleGrade}>Grade-adjusted</html.span> pace
           calculator ↗️↘️↗️
         </html.h1>
-
         {/* Unit System Selector */}
         <UnitSelector<UnitSystem>
           label="Unit System"
@@ -117,6 +120,15 @@ export default function App() {
             opt === "pace" ? "Incline → Flat" : "Flat → Incline"
           }
         />
+
+        <html.div style={styles.topButtons}>
+          <html.button
+            style={styles.presetButton}
+            onClick={() => setIsPresetsOpen(true)}
+          >
+            📋 Treadmill Presets
+          </html.button>
+        </html.div>
 
         {/* Speed/Pace Input Section */}
         <html.div style={styles.section}>
@@ -286,6 +298,11 @@ export default function App() {
           from Running Writings.
         </html.p>
       </html.footer>
+
+      <PresetsModal
+        isOpen={isPresetsOpen}
+        onClose={() => setIsPresetsOpen(false)}
+      />
     </html.div>
   );
 }
@@ -321,6 +338,28 @@ const styles = css.create({
     textDecorationColor: "#5f5f5f",
     textDecorationStyle: "double",
     display: "inline-block",
+  },
+  topButtons: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "start",
+    marginTop: "24px",
+    paddingLeft: "4px",
+  },
+  presetButton: {
+    backgroundColor: "#f1f5f9",
+    borderWidth: "1px",
+    borderColor: "#e2e8f0",
+    borderRadius: "12px",
+    padding: "8px 16px",
+    fontSize: "0.9rem",
+    fontWeight: "600",
+    color: "#475569",
+    cursor: "pointer",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: "8px",
   },
   helpLink: {
     display: "flex",
