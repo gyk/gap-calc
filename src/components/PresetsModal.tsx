@@ -94,6 +94,8 @@ const styles = css.create({
     color: "#333",
   },
   closeButton: {
+    backgroundColor: "transparent",
+    borderWidth: 0,
     fontSize: 24,
     cursor: "pointer",
     color: "#999",
@@ -111,6 +113,8 @@ const styles = css.create({
     padding: 16,
     width: "100%",
     textAlign: "left",
+    backgroundColor: "transparent",
+    borderWidth: 0,
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
     borderBottomStyle: "solid",

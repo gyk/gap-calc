@@ -43,6 +43,9 @@ const styles = css.create({
     flexDirection: "column",
     alignItems: "center",
     margin: "0 4px",
+    "@media (max-width: 640px)": {
+      margin: "0 2px",
+    },
   },
   label: {
     fontSize: "0.75rem",
@@ -50,6 +53,10 @@ const styles = css.create({
     marginBottom: "4px",
     textTransform: "uppercase",
     fontWeight: "600",
+    "@media (max-width: 640px)": {
+      fontSize: "0.65rem",
+      marginBottom: "2px",
+    },
   },
   dialBox: {
     display: "flex",
@@ -61,6 +68,10 @@ const styles = css.create({
     borderColor: "#007bff",
     padding: "8px",
     boxShadow: "0 2px 8px rgba(0, 123, 255, 0.2)",
+    "@media (max-width: 640px)": {
+      padding: "4px",
+      borderRadius: "8px",
+    },
   },
   button: {
     backgroundColor: "transparent",
@@ -75,6 +86,10 @@ const styles = css.create({
     ":hover": {
       color: "#007bff",
     },
+    "@media (max-width: 640px)": {
+      fontSize: "1rem",
+      padding: "2px 6px",
+    },
   },
   value: {
     fontSize: "1.5rem",
@@ -83,5 +98,10 @@ const styles = css.create({
     padding: "6px 0",
     minWidth: "1.5rem",
     textAlign: "center",
+    "@media (max-width: 640px)": {
+      fontSize: "1.2rem",
+      padding: "4px 0",
+      minWidth: "1.2rem",
+    },
   },
 });

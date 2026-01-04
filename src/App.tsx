@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { css, html } from "react-strict-dom";
 import { DigitDial } from "./components/DigitDial";
 import { InclineInput } from "./components/InclineInput";
@@ -49,6 +49,24 @@ export default function App() {
   } = useGapStore();
 
   const [isPresetsOpen, setIsPresetsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" ? window.innerWidth <= 640 : false,
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 640);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // If on mobile and unit system is "both", switch to "metric"
+  useEffect(() => {
+    if (isMobile && unitSystem === "both") {
+      setUnitSystem("metric");
+    }
+  }, [isMobile, unitSystem, setUnitSystem]);
 
   // Determine speedMode based on inputUnit
   const speedMode =
@@ -105,7 +123,9 @@ export default function App() {
         {/* Unit System Selector */}
         <UnitSelector<UnitSystem>
           label="Unit System"
-          options={["metric", "imperial", "both"]}
+          options={
+            isMobile ? ["metric", "imperial"] : ["metric", "imperial", "both"]
+          }
           value={unitSystem}
           onChange={setUnitSystem}
         />
@@ -136,11 +156,11 @@ export default function App() {
             <html.div style={styles.sectionTitle}>
               {calcMode === "pace"
                 ? inputUnit === "mph" || inputUnit === "km/h"
-                  ? "Hill Speed"
-                  : "Hill Pace"
+                  ? "Speed"
+                  : "Pace"
                 : inputUnit === "mph" || inputUnit === "km/h"
-                  ? "Flat Speed (Effort)"
-                  : "Flat Pace (Effort)"}
+                  ? "Speed (Effort)"
+                  : "Pace (Effort)"}
             </html.div>
             <HelpLink href="https://apps.runningwritings.com/gap-calculator/#pace-vs-effort" />
           </html.div>
@@ -324,6 +344,10 @@ const styles = css.create({
     maxWidth: "540px",
     boxShadow:
       "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+    "@media (max-width: 640px)": {
+      padding: "16px",
+      borderRadius: "16px",
+    },
   },
   title: {
     fontSize: "2rem",
@@ -331,6 +355,10 @@ const styles = css.create({
     color: "#0f172a",
     marginBottom: "24px",
     textAlign: "center",
+    "@media (max-width: 640px)": {
+      fontSize: "1.5rem",
+      marginBottom: "16px",
+    },
   },
   titleGrade: {
     transform: "rotate(-3deg)",
@@ -429,12 +457,19 @@ const styles = css.create({
     alignItems: "center",
     justifyContent: "center",
     gap: "12px",
+    "@media (max-width: 640px)": {
+      gap: "6px",
+    },
   },
   separator: {
     fontSize: "1.5rem",
     fontWeight: "bold",
     color: "#007bff",
     paddingTop: "20px",
+    "@media (max-width: 640px)": {
+      fontSize: "1.2rem",
+      paddingTop: "16px",
+    },
   },
   footer: {
     marginTop: "32px",

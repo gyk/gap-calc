@@ -26,14 +26,14 @@ export function GradeArrowButtons({
         style={styles.button}
         aria-label={`Decrease grade by ${largeStep}`}
       >
-        ≪
+        «
       </html.button>
       <html.button
         onClick={onSmallDecrement}
         style={styles.button}
         aria-label={`Decrease grade by ${smallStep}`}
       >
-        ﹤
+        ‹
       </html.button>
       <html.div style={styles.display}>
         <html.div style={styles.label}>Grade</html.div>
@@ -44,14 +44,14 @@ export function GradeArrowButtons({
         style={styles.button}
         aria-label={`Increase grade by ${smallStep}`}
       >
-        ﹥
+        ›
       </html.button>
       <html.button
         onClick={onLargeIncrement}
         style={styles.button}
         aria-label={`Increase grade by ${largeStep}`}
       >
-        ≫
+        »
       </html.button>
     </html.div>
   );
@@ -70,6 +70,10 @@ const styles = css.create({
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: "#bde2ff",
+    "@media (max-width: 640px)": {
+      gap: "6px",
+      padding: "8px",
+    },
   },
   button: {
     width: "48px",
@@ -100,6 +104,11 @@ const styles = css.create({
       color: "#ffffff",
       transform: "scale(0.95)",
     },
+    "@media (max-width: 640px)": {
+      width: "36px",
+      height: "36px",
+      fontSize: "1.2rem",
+    },
   },
   display: {
     display: "flex",
@@ -113,16 +122,26 @@ const styles = css.create({
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: "#007bff",
+    "@media (max-width: 640px)": {
+      minWidth: "70px",
+      padding: "6px",
+    },
   },
   label: {
     fontSize: "0.75rem",
     color: "#0056b3",
     fontWeight: "600",
     textTransform: "uppercase",
+    "@media (max-width: 640px)": {
+      fontSize: "0.65rem",
+    },
   },
   value: {
     fontSize: "1.75rem",
     fontWeight: "700",
     color: "#0056b3",
+    "@media (max-width: 640px)": {
+      fontSize: "1.4rem",
+    },
   },
 });

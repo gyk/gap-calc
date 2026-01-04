@@ -52,6 +52,9 @@ const styles = css.create({
     alignItems: "center",
     gap: "4px",
     width: "56px",
+    "@media (max-width: 640px)": {
+      width: "44px",
+    },
   },
   clickable: {
     cursor: "pointer",
@@ -59,6 +62,10 @@ const styles = css.create({
   svg: {
     width: "40px",
     height: "40px",
+    "@media (max-width: 640px)": {
+      width: "32px",
+      height: "32px",
+    },
   },
   label: {
     width: "100%",
@@ -67,5 +74,8 @@ const styles = css.create({
     color: "#0056b3",
     fontWeight: "600",
     textTransform: "uppercase",
+    "@media (max-width: 640px)": {
+      fontSize: "0.65rem",
+    },
   },
 });

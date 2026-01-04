@@ -16,14 +16,14 @@ export const PRESETS: Preset[] = [
   },
   {
     id: "bruce-1'",
-    name: "Bruce Protocol (Modified), Stage 1",
+    name: "Bruce Protocol (modified), Stage 1",
     description: "0% incline, 1.7 mph",
     inclinePercent: 0,
     speedMph: 1.7,
   },
   {
     id: "bruce-2'",
-    name: "Bruce Protocol (Modified), Stage 2",
+    name: "Bruce Protocol (modified), Stage 2",
     description: "5% incline, 1.7 mph",
     inclinePercent: 5,
     speedMph: 1.7,

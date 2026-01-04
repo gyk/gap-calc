@@ -206,6 +206,9 @@ const styles = css.create({
     borderWidth: "1px",
     borderColor: "#bde2ff",
     marginTop: "12px",
+    "@media (max-width: 640px)": {
+      padding: "8px",
+    },
   },
   row: {
     display: "flex",
@@ -214,6 +217,9 @@ const styles = css.create({
     justifyContent: "center",
     gap: "12px",
     marginBottom: "8px",
+    "@media (max-width: 640px)": {
+      gap: "6px",
+    },
   },
   column: {
     display: "flex",
@@ -232,5 +238,8 @@ const styles = css.create({
     justifyContent: "center",
     gap: "16px",
     marginBottom: "8px",
+    "@media (max-width: 640px)": {
+      gap: "8px",
+    },
   },
 });
