@@ -8,6 +8,27 @@ export interface Preset {
 
 export const PRESETS: Preset[] = [
   {
+    id: "7-5kph",
+    name: "7%, 5 km/h",
+    description: "",
+    inclinePercent: 7,
+    speedMph: 3.10686,
+  },
+  {
+    id: "12-4kph",
+    name: "12%, 4 km/h",
+    description: "",
+    inclinePercent: 12,
+    speedMph: 2.48548,
+  },
+  {
+    id: "20-3kph",
+    name: "20%, 3 km/h",
+    description: "",
+    inclinePercent: 20,
+    speedMph: 1.86411,
+  },
+  {
     id: "12-3-30",
     name: "12-3-30",
     description: "12% incline, 3 mph",

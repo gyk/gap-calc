@@ -43,7 +43,6 @@ export function PresetsModal({ isOpen, onClose }: PresetsModalProps) {
                     : preset.description}
                 </html.div>
               </html.div>
-              <html.div style={styles.applyText}>Apply</html.div>
             </html.button>
           ))}
         </html.div>
@@ -134,11 +133,5 @@ const styles = css.create({
   presetDescription: {
     fontSize: 14,
     color: "#666",
-  },
-  applyText: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#28a745",
-    marginLeft: 12,
   },
 });
