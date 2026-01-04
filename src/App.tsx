@@ -214,6 +214,21 @@ export default function App() {
           <OutputDisplay />
         </html.div>
       </html.div>
+
+      <html.footer style={styles.footer}>
+        <html.p style={styles.footerText}>
+          Based on the original{" "}
+          <html.a
+            href="https://apps.runningwritings.com/gap-calculator/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={styles.link}
+          >
+            Grade-adjusted pace calculator
+          </html.a>{" "}
+          from Running Writings.
+        </html.p>
+      </html.footer>
     </html.div>
   );
 }
@@ -282,5 +297,18 @@ const styles = css.create({
     fontWeight: "bold",
     color: "#007bff",
     paddingTop: "20px",
+  },
+  footer: {
+    marginTop: "32px",
+    paddingBottom: "24px",
+    textAlign: "center",
+  },
+  footerText: {
+    fontSize: "0.875rem",
+    color: "#64748b",
+  },
+  link: {
+    color: "#0056b3",
+    textDecorationLine: "underline",
   },
 });
