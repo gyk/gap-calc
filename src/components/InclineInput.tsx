@@ -54,19 +54,6 @@ export function InclineInput() {
   const toggleDirection = () => {
     const newDirection = hillDirection === "uphill" ? "downhill" : "uphill";
     setHillDirection(newDirection);
-
-    if (hillInputMode === "grade") {
-      setGradeInput(-gradeInput.percent);
-    } else if (hillInputMode === "angle") {
-      setAngleInput(-angleInput.degrees);
-    } else if (hillInputMode === "rise/run") {
-      setRiseRunInput(
-        -riseRunInput.rise,
-        riseRunInput.run,
-        riseRunInput.riseUnit,
-        riseRunInput.runUnit,
-      );
-    }
   };
 
   const renderGradeInput = () => (

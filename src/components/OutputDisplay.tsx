@@ -35,21 +35,10 @@ export function OutputDisplay() {
     );
   }
 
-  let inputGrade = 0;
+  let inputGrade = state.grade;
   let vertSpeedMS = 0;
 
-  if (state.hillInputMode === "grade") {
-    inputGrade = state.gradeInput.percent / 100;
-  } else if (state.hillInputMode === "angle") {
-    inputGrade = Math.tan((state.angleInput.degrees * Math.PI) / 180);
-  } else if (state.hillInputMode === "rise/run") {
-    inputGrade = calculateGradeFromRiseRun(
-      state.riseRunInput.rise,
-      state.riseRunInput.run,
-      state.riseRunInput.riseUnit,
-      state.riseRunInput.runUnit,
-    );
-  } else if (state.hillInputMode === "vert speed") {
+  if (state.hillInputMode === "vert speed") {
     vertSpeedMS = convertVertSpeedToMS(
       state.vertSpeedInput.value,
       state.vertSpeedInput.unit,

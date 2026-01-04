@@ -283,6 +283,39 @@ export function convertSpeedToMS(speed: number, units: PaceUnit): number {
   return 0;
 }
 
+export function convertMSToPace(
+  speedMS: number,
+  unit: PaceUnit,
+): { minutes: number; seconds: number } {
+  if (speedMS <= 0) return { minutes: 0, seconds: 0 };
+  let paceDecimal = 0;
+  if (unit === "/mi") {
+    paceDecimal = 1609.344 / (speedMS * 60);
+  } else if (unit === "/km") {
+    paceDecimal = 1000 / (speedMS * 60);
+  } else {
+    return { minutes: 0, seconds: 0 };
+  }
+
+  const totalSeconds = Math.round(paceDecimal * 60);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return { minutes, seconds };
+}
+
+export function convertMSToSpeed(speedMS: number, unit: PaceUnit): number {
+  if (unit === "mph") {
+    return speedMS / 0.44704;
+  }
+  if (unit === "km/h") {
+    return speedMS * 3.6;
+  }
+  if (unit === "m/s") {
+    return speedMS;
+  }
+  return 0;
+}
+
 export function convertVertSpeedToMS(vertSpeed: number, units: string): number {
   if (units === "feet per hour" || units === "ft/hr") {
     return (vertSpeed * 0.3048) / 3600;

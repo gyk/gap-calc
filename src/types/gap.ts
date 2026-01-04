@@ -89,6 +89,7 @@ export interface GapState {
   // Hill settings
   hillDirection: HillDirection;
   hillInputMode: HillInputMode;
+  grade: number; // Internal decimal grade (e.g. 0.05 for 5%)
   gradeInput: GradeInput;
   angleInput: AngleInput;
   riseRunInput: RiseRunInput;
