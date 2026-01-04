@@ -6,6 +6,7 @@ interface UnitSelectorProps<T extends string> {
   onChange: (value: T) => void;
   label?: string;
   renderOption?: (option: T) => string;
+  nowrap?: boolean;
 }
 
 export function UnitSelector<T extends string>({
@@ -14,6 +15,7 @@ export function UnitSelector<T extends string>({
   onChange,
   label,
   renderOption,
+  nowrap = true,
 }: UnitSelectorProps<T>) {
   return (
     <html.div style={styles.container}>
@@ -23,7 +25,11 @@ export function UnitSelector<T extends string>({
           <html.button
             key={option}
             onClick={() => onChange(option)}
-            style={[styles.button, value === option && styles.activeButton]}
+            style={[
+              styles.button,
+              value === option && styles.activeButton,
+              !nowrap && styles.wrapButton,
+            ]}
           >
             {renderOption ? renderOption(option) : option}
           </html.button>
@@ -72,11 +78,15 @@ const styles = css.create({
     textAlign: "center",
     transition: "all 0.2s ease",
     minWidth: "50px",
+    whiteSpace: "nowrap",
     "@media (max-width: 640px)": {
       padding: "8px 10px",
       fontSize: "0.75rem",
       minWidth: "40px",
     },
+  },
+  wrapButton: {
+    whiteSpace: "normal",
   },
   activeButton: {
     backgroundColor: "#007bff",

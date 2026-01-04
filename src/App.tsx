@@ -267,6 +267,7 @@ export default function App() {
             options={["grade", "angle", "rise/run", "vert speed"]}
             value={hillInputMode}
             onChange={setHillInputMode}
+            nowrap={false}
             renderOption={(opt) => {
               if (isMobile) {
                 if (opt === "rise/run") return "rise";

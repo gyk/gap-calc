@@ -133,6 +133,7 @@ const styles = css.create({
     fontSize: "1.25rem",
     fontWeight: "500",
     color: "#64748b",
+    whiteSpace: "nowrap",
   },
   subtext: {
     fontSize: "1rem",

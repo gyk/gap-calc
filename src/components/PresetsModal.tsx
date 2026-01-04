@@ -39,7 +39,7 @@ export function PresetsModal({ isOpen, onClose }: PresetsModalProps) {
                   {unitSystem === "metric"
                     ? `${preset.inclinePercent}% incline, ${(
                         preset.speedMph * 1.609344
-                      ).toFixed(1)} km/h`
+                      ).toFixed(1)}\u00A0km/h`
                     : preset.description}
                 </html.div>
               </html.div>
