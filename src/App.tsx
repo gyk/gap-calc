@@ -11,6 +11,22 @@ import type {
   UnitSystem,
 } from "./types/gap";
 
+const HelpLink = ({
+  href,
+  label = "?",
+  style,
+}: { href: string; label?: string; style?: any }) => (
+  <html.a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    style={[styles.helpLink, style]}
+    aria-label="Learn more"
+  >
+    {label}
+  </html.a>
+);
+
 export default function App() {
   const {
     unitSystem,
@@ -20,6 +36,7 @@ export default function App() {
     calcMode,
     hillInputMode,
     outputUnit,
+    grade,
     setPaceInput,
     setSpeedInput,
     setInputUnit,
@@ -47,6 +64,32 @@ export default function App() {
     if (unitSystem === "imperial") return ["/mi", "mph"];
     return ["/mi", "/km", "mph", "km/h"];
   };
+
+  const alerts = [];
+  if (grade < -0.08) {
+    alerts.push({
+      text: "This downhill might be too steep to gain the full energetic benefit",
+      link: "https://apps.runningwritings.com/gap-calculator/#steep-downhills",
+      label: "i",
+      color: "#007bff",
+    });
+  } else if (grade > 0.25) {
+    alerts.push({
+      text: "This uphill might be steep enough that walking would be more energetically efficient",
+      link: "https://apps.runningwritings.com/gap-calculator/#walk-vs-run",
+      label: "i",
+      color: "#007bff",
+    });
+  }
+
+  if (calcMode === "effort" && hillInputMode === "vert speed") {
+    alerts.push({
+      text: "Effort-based GAP using vert speed can behave unpredictably!",
+      link: "https://apps.runningwritings.com/gap-calculator/#vert-speed-effort",
+      label: "!",
+      color: "#dc3545",
+    });
+  }
 
   return (
     <html.div style={styles.container}>
@@ -77,14 +120,17 @@ export default function App() {
 
         {/* Speed/Pace Input Section */}
         <html.div style={styles.section}>
-          <html.div style={styles.sectionTitle}>
-            {calcMode === "pace"
-              ? inputUnit === "mph" || inputUnit === "km/h"
-                ? "Hill Speed"
-                : "Hill Pace"
-              : inputUnit === "mph" || inputUnit === "km/h"
-                ? "Flat Speed (Effort)"
-                : "Flat Pace (Effort)"}
+          <html.div style={styles.sectionHeader}>
+            <html.div style={styles.sectionTitle}>
+              {calcMode === "pace"
+                ? inputUnit === "mph" || inputUnit === "km/h"
+                  ? "Hill Speed"
+                  : "Hill Pace"
+                : inputUnit === "mph" || inputUnit === "km/h"
+                  ? "Flat Speed (Effort)"
+                  : "Flat Pace (Effort)"}
+            </html.div>
+            <HelpLink href="https://apps.runningwritings.com/gap-calculator/#pace-vs-effort" />
           </html.div>
 
           <html.div style={styles.inputRow}>
@@ -199,6 +245,17 @@ export default function App() {
           />
 
           <InclineInput />
+
+          {alerts.map((alert, index) => (
+            <html.div key={index} style={styles.alertBox}>
+              <HelpLink
+                href={alert.link}
+                label={alert.label}
+                style={{ backgroundColor: alert.color }}
+              />
+              <html.span style={styles.alertText}>{alert.text}</html.span>
+            </html.div>
+          ))}
         </html.div>
 
         {/* Output Section */}
@@ -264,6 +321,48 @@ const styles = css.create({
     textDecorationColor: "#5f5f5f",
     textDecorationStyle: "double",
     display: "inline-block",
+  },
+  helpLink: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "20px",
+    height: "20px",
+    borderRadius: "10px",
+    backgroundColor: "#007bff",
+    color: "#ffffff",
+    fontSize: "12px",
+    fontWeight: "bold",
+    textDecorationLine: "none",
+  },
+  modeHelp: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: "8px",
+    marginTop: "8px",
+    justifyContent: "center",
+  },
+  helpText: {
+    fontSize: "0.8rem",
+    color: "#64748b",
+  },
+  alertBox: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: "12px",
+    marginTop: "16px",
+    padding: "12px",
+    backgroundColor: "#f8fafc",
+    borderRadius: "12px",
+    borderWidth: "1px",
+    borderColor: "#e2e8f0",
+  },
+  alertText: {
+    fontSize: "0.85rem",
+    color: "#475569",
+    flex: 1,
   },
   section: {
     marginTop: "24px",
