@@ -5,6 +5,7 @@ interface UnitSelectorProps<T extends string> {
   value: T;
   onChange: (value: T) => void;
   label?: string;
+  renderOption?: (option: T) => string;
 }
 
 export function UnitSelector<T extends string>({
@@ -12,6 +13,7 @@ export function UnitSelector<T extends string>({
   value,
   onChange,
   label,
+  renderOption,
 }: UnitSelectorProps<T>) {
   return (
     <html.div style={styles.container}>
@@ -23,7 +25,7 @@ export function UnitSelector<T extends string>({
             onClick={() => onChange(option)}
             style={[styles.button, value === option && styles.activeButton]}
           >
-            {option}
+            {renderOption ? renderOption(option) : option}
           </html.button>
         ))}
       </html.div>

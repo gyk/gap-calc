@@ -14,10 +14,12 @@ export function InclineInput() {
     angleInput,
     riseRunInput,
     vertSpeedInput,
+    hillDirection,
     setGradeInput,
     setAngleInput,
     setRiseRunInput,
     setVertSpeedInput,
+    setHillDirection,
   } = useGapStore();
 
   // Get filtered unit options based on unit system
@@ -40,7 +42,7 @@ export function InclineInput() {
   };
 
   // Determine if uphill based on current input mode
-  let isUphill = true;
+  let isUphill = hillDirection === "uphill";
   if (hillInputMode === "grade") {
     isUphill = gradeInput.percent >= 0;
   } else if (hillInputMode === "angle") {
@@ -49,9 +51,27 @@ export function InclineInput() {
     isUphill = riseRunInput.rise >= 0;
   }
 
+  const toggleDirection = () => {
+    const newDirection = hillDirection === "uphill" ? "downhill" : "uphill";
+    setHillDirection(newDirection);
+
+    if (hillInputMode === "grade") {
+      setGradeInput(-gradeInput.percent);
+    } else if (hillInputMode === "angle") {
+      setAngleInput(-angleInput.degrees);
+    } else if (hillInputMode === "rise/run") {
+      setRiseRunInput(
+        -riseRunInput.rise,
+        riseRunInput.run,
+        riseRunInput.riseUnit,
+        riseRunInput.runUnit,
+      );
+    }
+  };
+
   const renderGradeInput = () => (
     <html.div style={styles.gradeRow}>
-      <HillIndicator isUphill={isUphill} />
+      <HillIndicator isUphill={isUphill} onToggle={toggleDirection} />
       <GradeArrowButtons
         value={gradeInput.percent}
         onSmallIncrement={() => setGradeInput(gradeInput.percent + 1)}
@@ -66,7 +86,7 @@ export function InclineInput() {
 
   const renderAngleInput = () => (
     <html.div style={styles.row}>
-      <HillIndicator isUphill={isUphill} />
+      <HillIndicator isUphill={isUphill} onToggle={toggleDirection} />
       <DigitDial
         label="Degrees"
         value={angleInput.degrees.toFixed(1)}
@@ -83,7 +103,7 @@ export function InclineInput() {
   const renderRiseRunInput = () => (
     <html.div style={styles.column}>
       <html.div style={styles.row}>
-        <HillIndicator isUphill={isUphill} />
+        <HillIndicator isUphill={isUphill} onToggle={toggleDirection} />
         <html.div style={styles.riseRunContainer}>
           <html.div style={styles.row}>
             <DigitDial
@@ -161,6 +181,7 @@ export function InclineInput() {
   const renderVertSpeedInput = () => (
     <html.div style={styles.column}>
       <html.div style={styles.row}>
+        <HillIndicator isUphill={isUphill} onToggle={toggleDirection} />
         <DigitDial
           label="Vert Speed"
           value={vertSpeedInput.value}

@@ -5,9 +5,6 @@
 /** Speed/pace unit options for input and output */
 export type PaceUnit = "/mi" | "/km" | "mph" | "km/h" | "m/s";
 
-/** Mode for entering speed - either pace (mm:ss) or speed (decimal) */
-export type SpeedMode = "pace" | "speed";
-
 /** Calculation mode - pace-to-effort or effort-to-pace */
 export type CalcMode = "pace" | "effort";
 
@@ -82,7 +79,6 @@ export interface GapState {
   unitSystem: UnitSystem;
 
   // Speed/pace input
-  speedMode: SpeedMode;
   paceInput: PaceInput;
   speedInput: SpeedInput;
   inputUnit: PaceUnit;

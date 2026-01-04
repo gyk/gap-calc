@@ -31,7 +31,9 @@ export default function App() {
 
   // Determine speedMode based on inputUnit
   const speedMode =
-    inputUnit === "mph" || inputUnit === "km/h" ? "speed" : "pace";
+    inputUnit === "mph" || inputUnit === "km/h" || inputUnit === "m/s"
+      ? "speed"
+      : "pace";
 
   // Get filtered unit options based on unit system
   const getInputUnitOptions = (): PaceUnit[] => {
@@ -51,7 +53,7 @@ export default function App() {
       <html.div style={styles.card}>
         <html.h1 style={styles.title}>
           <html.span style={styles.titleGrade}>Grade-adjusted</html.span> pace
-          calculator
+          calculator ↗️↘️↗️
         </html.h1>
 
         {/* Unit System Selector */}
@@ -68,6 +70,9 @@ export default function App() {
           options={["pace", "effort"]}
           value={calcMode}
           onChange={setCalcMode}
+          renderOption={(opt) =>
+            opt === "pace" ? "Incline → Flat" : "Flat → Incline"
+          }
         />
 
         {/* Speed/Pace Input Section */}
@@ -75,9 +80,11 @@ export default function App() {
           <html.div style={styles.sectionTitle}>
             {calcMode === "pace"
               ? inputUnit === "mph" || inputUnit === "km/h"
-                ? "Flat Speed"
-                : "Flat Pace"
-              : "Target Effort (Flat)"}
+                ? "Hill Speed"
+                : "Hill Pace"
+              : inputUnit === "mph" || inputUnit === "km/h"
+                ? "Flat Speed (Effort)"
+                : "Flat Pace (Effort)"}
           </html.div>
 
           <html.div style={styles.inputRow}>

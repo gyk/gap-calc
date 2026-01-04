@@ -2,13 +2,17 @@ import { css, html } from "react-strict-dom";
 
 interface HillIndicatorProps {
   isUphill: boolean;
+  onToggle?: () => void;
 }
 
-export function HillIndicator({ isUphill }: HillIndicatorProps) {
+export function HillIndicator({ isUphill, onToggle }: HillIndicatorProps) {
   // <svg> element is not currently supported on native.
   // See https://github.com/facebook/react-strict-dom/issues/4
   return (
-    <html.div style={styles.container}>
+    <html.div
+      style={[styles.container, onToggle && styles.clickable]}
+      onClick={onToggle}
+    >
       <svg
         viewBox="0 0 100 80"
         style={styles.svg}
@@ -48,6 +52,9 @@ const styles = css.create({
     alignItems: "center",
     gap: "4px",
     width: "56px",
+  },
+  clickable: {
+    cursor: "pointer",
   },
   svg: {
     width: "40px",

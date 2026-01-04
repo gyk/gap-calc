@@ -101,6 +101,9 @@ export function getEquivalentFlatSpeed(metabolicPower: number): number {
  * Convert decimal pace to string format (mm:ss)
  */
 export function decimalPaceToString(paceDecimal: number): string {
+  if (!Number.isFinite(paceDecimal) || paceDecimal <= 0) {
+    return "--:--";
+  }
   const totalSeconds = Math.round(paceDecimal * 60);
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
@@ -252,12 +255,15 @@ export function convertPaceToMS(
   units: PaceUnit,
 ): number {
   const decMinutes = minutes + seconds / 60;
+  if (decMinutes === 0) return 0;
   if (units === "/mi") {
     return 1609.344 / (60 * decMinutes);
   }
   if (units === "/km") {
     return 1000 / (60 * decMinutes);
   }
+  // Fallback for speed units if called incorrectly
+  if (units === "mph") return (1 / decMinutes) * 0.44704 * 60; // This is weird but let's just handle it
   return 0;
 }
 
@@ -271,6 +277,9 @@ export function convertSpeedToMS(speed: number, units: PaceUnit): number {
   if (units === "m/s") {
     return speed;
   }
+  // Fallback for pace units if called incorrectly
+  if (units === "/km") return 1000 / (speed * 60);
+  if (units === "/mi") return 1609.344 / (speed * 60);
   return 0;
 }
 

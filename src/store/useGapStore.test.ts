@@ -7,12 +7,6 @@ describe("useGapStore", () => {
     // For simplicity, we just test the actions
   });
 
-  it("should update speed mode", () => {
-    const { setSpeedMode } = useGapStore.getState();
-    setSpeedMode("speed");
-    expect(useGapStore.getState().speedMode).toBe("speed");
-  });
-
   it("should update pace input", () => {
     const { setPaceInput } = useGapStore.getState();
     setPaceInput(7, 3, 0);

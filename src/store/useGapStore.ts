@@ -8,14 +8,12 @@ import type {
   PaceUnit,
   RiseUnit,
   RunUnit,
-  SpeedMode,
   UnitSystem,
   VertSpeedUnit,
 } from "../types/gap";
 
 interface GapActions {
   setUnitSystem: (system: UnitSystem) => void;
-  setSpeedMode: (mode: SpeedMode) => void;
   setPaceInput: (minutes: number, tens: number, ones: number) => void;
   setSpeedInput: (whole: number, decimal: number) => void;
   setInputUnit: (unit: PaceUnit) => void;
@@ -36,18 +34,17 @@ interface GapActions {
 
 const initialState: GapState = {
   unitSystem: "metric",
-  speedMode: "pace",
   paceInput: { minutes: 8, tensSeconds: 0, onesSeconds: 0 },
-  speedInput: { whole: 7, decimal: 5 },
-  inputUnit: "/km",
+  speedInput: { whole: 6, decimal: 0 },
+  inputUnit: "km/h",
   calcMode: "pace",
   hillDirection: "uphill",
   hillInputMode: "grade",
-  gradeInput: { percent: 5 },
+  gradeInput: { percent: 3 },
   angleInput: { degrees: 2.86 },
   riseRunInput: { rise: 50, run: 1, riseUnit: "meters", runUnit: "km" },
   vertSpeedInput: { value: 300, unit: "m/hr" },
-  outputUnit: "km/h",
+  outputUnit: "/km",
 };
 
 export const useGapStore = create<GapState & GapActions>()(
@@ -72,10 +69,6 @@ export const useGapStore = create<GapState & GapActions>()(
           state.vertSpeedInput.unit = "ft/hr";
         }
         // For "both", we keep the current units but allow both options
-      }),
-    setSpeedMode: (mode) =>
-      set((state) => {
-        state.speedMode = mode;
       }),
     setPaceInput: (minutes, tens, ones) =>
       set((state) => {

@@ -14,8 +14,15 @@ export function OutputDisplay() {
   const state = useGapStore();
 
   // 1. Convert inputs to standard units (m/s and decimal grade)
+  const speedMode =
+    state.inputUnit === "mph" ||
+    state.inputUnit === "km/h" ||
+    state.inputUnit === "m/s"
+      ? "speed"
+      : "pace";
+
   let inputMS = 0;
-  if (state.speedMode === "pace") {
+  if (speedMode === "pace") {
     inputMS = convertPaceToMS(
       state.paceInput.minutes,
       state.paceInput.tensSeconds * 10 + state.paceInput.onesSeconds,
@@ -50,19 +57,6 @@ export function OutputDisplay() {
     // Grade is solved iteratively in calculateMainResult for vert speed mode
   }
 
-  // Adjust grade for direction
-  if (
-    state.hillDirection === "downhill" &&
-    state.hillInputMode !== "vert speed"
-  ) {
-    inputGrade = -Math.abs(inputGrade);
-  } else if (
-    state.hillDirection === "uphill" &&
-    state.hillInputMode !== "vert speed"
-  ) {
-    inputGrade = Math.abs(inputGrade);
-  }
-
   // 2. Calculate result
   const { speed: resultSpeed, grade: resultGrade } = calculateMainResult({
     calcMode: state.calcMode,
@@ -73,25 +67,30 @@ export function OutputDisplay() {
     hillDirection: state.hillDirection,
   });
 
-  const formattedOutput = !Number.isNaN(resultSpeed)
-    ? convertDict[state.outputUnit](resultSpeed)
-    : "---";
+  const formattedOutput =
+    !Number.isNaN(resultSpeed) &&
+    Number.isFinite(resultSpeed) &&
+    resultSpeed > 0
+      ? convertDict[state.outputUnit](resultSpeed)
+      : "🤔";
 
   const displayGrade = (resultGrade * 100).toFixed(0);
 
   return (
     <html.div style={styles.wrapper}>
       <html.div style={styles.container}>
-        <html.div style={styles.label}>
-          {state.calcMode === "pace"
-            ? "Grade-Adjusted Pace"
-            : "Equivalent Hill Pace"}
-        </html.div>
+        <html.div style={styles.label}>Equivalent pace</html.div>
         <html.div style={styles.value}>
           {formattedOutput}
-          <html.span style={styles.unit}>{state.outputUnit}</html.span>
+          {formattedOutput !== "🤔" && (
+            <html.span style={styles.unit}>{state.outputUnit}</html.span>
+          )}
         </html.div>
-        <html.div style={styles.subtext}>at {displayGrade}% grade</html.div>
+        <html.div style={styles.subtext}>
+          {state.calcMode === "pace"
+            ? "on flat ground"
+            : `at ${displayGrade}% grade`}
+        </html.div>
       </html.div>
     </html.div>
   );
