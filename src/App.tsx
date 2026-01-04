@@ -267,6 +267,13 @@ export default function App() {
             options={["grade", "angle", "rise/run", "vert speed"]}
             value={hillInputMode}
             onChange={setHillInputMode}
+            renderOption={(opt) => {
+              if (isMobile) {
+                if (opt === "rise/run") return "rise";
+                if (opt === "vert speed") return "v.spd";
+              }
+              return opt;
+            }}
           />
 
           <InclineInput />
@@ -365,7 +372,7 @@ const styles = css.create({
     flexDirection: "row",
     justifyContent: "start",
     marginTop: "24px",
-    paddingLeft: "4px",
+    paddingLeft: "3px",
   },
   presetButton: {
     backgroundColor: "#f1f5f9",

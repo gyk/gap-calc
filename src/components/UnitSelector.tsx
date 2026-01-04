@@ -50,6 +50,7 @@ const styles = css.create({
   buttonGroup: {
     display: "flex",
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: "4px",
     backgroundColor: "#f0f7ff",
     borderRadius: "10px",
@@ -71,7 +72,6 @@ const styles = css.create({
     textAlign: "center",
     transition: "all 0.2s ease",
     minWidth: "50px",
-    whiteSpace: "nowrap",
     "@media (max-width: 640px)": {
       padding: "8px 10px",
       fontSize: "0.75rem",

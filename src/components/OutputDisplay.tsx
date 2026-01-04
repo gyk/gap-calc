@@ -1,4 +1,5 @@
 import { css, html } from "react-strict-dom";
+import { useIsMobile } from "../hooks/useIsMobile";
 import {
   calculateGradeFromRiseRun,
   calculateMainResult,
@@ -12,6 +13,7 @@ import type { PaceUnit } from "../types/gap";
 
 export function OutputDisplay() {
   const state = useGapStore();
+  const isMobile = useIsMobile();
 
   // 1. Convert inputs to standard units (m/s and decimal grade)
   const speedMode =
@@ -67,9 +69,9 @@ export function OutputDisplay() {
 
   return (
     <html.div style={styles.wrapper}>
-      <html.div style={styles.container}>
+      <html.div style={[styles.container, isMobile && styles.containerMobile]}>
         <html.div style={styles.label}>Equivalent pace</html.div>
-        <html.div style={styles.value}>
+        <html.div style={[styles.value, isMobile && styles.valueMobile]}>
           {formattedOutput}
           {formattedOutput !== "🤔" && (
             <html.span style={styles.unit}>{state.outputUnit}</html.span>
@@ -104,6 +106,10 @@ const styles = css.create({
     boxShadow:
       "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
   },
+  containerMobile: {
+    padding: "16px",
+    marginTop: "16px",
+  },
   label: {
     fontSize: "0.875rem",
     fontWeight: "600",
@@ -119,6 +125,9 @@ const styles = css.create({
     display: "flex",
     alignItems: "baseline",
     gap: "8px",
+  },
+  valueMobile: {
+    fontSize: "2.5rem",
   },
   unit: {
     fontSize: "1.25rem",
