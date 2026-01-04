@@ -5,6 +5,7 @@ import { InclineInput } from "./components/InclineInput";
 import { OutputDisplay } from "./components/OutputDisplay";
 import { PresetsModal } from "./components/PresetsModal";
 import { UnitSelector } from "./components/UnitSelector";
+import { useIsMobile } from "./hooks/useIsMobile";
 import { useGapStore } from "./store/useGapStore";
 import type {
   CalcMode,
@@ -49,17 +50,7 @@ export default function App() {
   } = useGapStore();
 
   const [isPresetsOpen, setIsPresetsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(
-    typeof window !== "undefined" ? window.innerWidth <= 640 : false,
-  );
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 640);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const isMobile = useIsMobile();
 
   // If on mobile and unit system is "both", switch to "metric"
   useEffect(() => {
@@ -165,99 +156,101 @@ export default function App() {
             <HelpLink href="https://apps.runningwritings.com/gap-calculator/#pace-vs-effort" />
           </html.div>
 
-          <html.div style={styles.inputRow}>
-            {speedMode === "pace" ? (
-              <>
-                <DigitDial
-                  label="Min"
-                  value={paceInput.minutes}
-                  onIncrement={() =>
-                    setPaceInput(
-                      paceInput.minutes + 1,
-                      paceInput.tensSeconds,
-                      paceInput.onesSeconds,
-                    )
-                  }
-                  onDecrement={() =>
-                    setPaceInput(
-                      Math.max(0, paceInput.minutes - 1),
-                      paceInput.tensSeconds,
-                      paceInput.onesSeconds,
-                    )
-                  }
-                />
-                <html.div style={styles.separator}>:</html.div>
-                <DigitDial
-                  label="10s"
-                  value={paceInput.tensSeconds}
-                  onIncrement={() =>
-                    setPaceInput(
-                      paceInput.minutes,
-                      (paceInput.tensSeconds + 1) % 6,
-                      paceInput.onesSeconds,
-                    )
-                  }
-                  onDecrement={() =>
-                    setPaceInput(
-                      paceInput.minutes,
-                      (paceInput.tensSeconds + 5) % 6,
-                      paceInput.onesSeconds,
-                    )
-                  }
-                />
-                <DigitDial
-                  label="1s"
-                  value={paceInput.onesSeconds}
-                  onIncrement={() =>
-                    setPaceInput(
-                      paceInput.minutes,
-                      paceInput.tensSeconds,
-                      (paceInput.onesSeconds + 1) % 10,
-                    )
-                  }
-                  onDecrement={() =>
-                    setPaceInput(
-                      paceInput.minutes,
-                      paceInput.tensSeconds,
-                      (paceInput.onesSeconds + 9) % 10,
-                    )
-                  }
-                />
-              </>
-            ) : (
-              <>
-                <DigitDial
-                  label="Whole"
-                  value={speedInput.whole}
-                  onIncrement={() =>
-                    setSpeedInput(speedInput.whole + 1, speedInput.decimal)
-                  }
-                  onDecrement={() =>
-                    setSpeedInput(
-                      Math.max(0, speedInput.whole - 1),
-                      speedInput.decimal,
-                    )
-                  }
-                />
-                <html.div style={styles.separator}>.</html.div>
-                <DigitDial
-                  label="Dec"
-                  value={speedInput.decimal}
-                  onIncrement={() =>
-                    setSpeedInput(
-                      speedInput.whole,
-                      (speedInput.decimal + 1) % 10,
-                    )
-                  }
-                  onDecrement={() =>
-                    setSpeedInput(
-                      speedInput.whole,
-                      (speedInput.decimal + 9) % 10,
-                    )
-                  }
-                />
-              </>
-            )}
+          <html.div style={isMobile ? styles.inputColumn : styles.inputRow}>
+            <html.div style={styles.inputRow}>
+              {speedMode === "pace" ? (
+                <>
+                  <DigitDial
+                    label="Min"
+                    value={paceInput.minutes}
+                    onIncrement={() =>
+                      setPaceInput(
+                        paceInput.minutes + 1,
+                        paceInput.tensSeconds,
+                        paceInput.onesSeconds,
+                      )
+                    }
+                    onDecrement={() =>
+                      setPaceInput(
+                        Math.max(0, paceInput.minutes - 1),
+                        paceInput.tensSeconds,
+                        paceInput.onesSeconds,
+                      )
+                    }
+                  />
+                  <html.div style={styles.separator}>:</html.div>
+                  <DigitDial
+                    label="10s"
+                    value={paceInput.tensSeconds}
+                    onIncrement={() =>
+                      setPaceInput(
+                        paceInput.minutes,
+                        (paceInput.tensSeconds + 1) % 6,
+                        paceInput.onesSeconds,
+                      )
+                    }
+                    onDecrement={() =>
+                      setPaceInput(
+                        paceInput.minutes,
+                        (paceInput.tensSeconds + 5) % 6,
+                        paceInput.onesSeconds,
+                      )
+                    }
+                  />
+                  <DigitDial
+                    label="1s"
+                    value={paceInput.onesSeconds}
+                    onIncrement={() =>
+                      setPaceInput(
+                        paceInput.minutes,
+                        paceInput.tensSeconds,
+                        (paceInput.onesSeconds + 1) % 10,
+                      )
+                    }
+                    onDecrement={() =>
+                      setPaceInput(
+                        paceInput.minutes,
+                        paceInput.tensSeconds,
+                        (paceInput.onesSeconds + 9) % 10,
+                      )
+                    }
+                  />
+                </>
+              ) : (
+                <>
+                  <DigitDial
+                    label="Whole"
+                    value={speedInput.whole}
+                    onIncrement={() =>
+                      setSpeedInput(speedInput.whole + 1, speedInput.decimal)
+                    }
+                    onDecrement={() =>
+                      setSpeedInput(
+                        Math.max(0, speedInput.whole - 1),
+                        speedInput.decimal,
+                      )
+                    }
+                  />
+                  <html.div style={styles.separator}>.</html.div>
+                  <DigitDial
+                    label="Dec"
+                    value={speedInput.decimal}
+                    onIncrement={() =>
+                      setSpeedInput(
+                        speedInput.whole,
+                        (speedInput.decimal + 1) % 10,
+                      )
+                    }
+                    onDecrement={() =>
+                      setSpeedInput(
+                        speedInput.whole,
+                        (speedInput.decimal + 9) % 10,
+                      )
+                    }
+                  />
+                </>
+              )}
+            </html.div>
             <UnitSelector<PaceUnit>
               options={getInputUnitOptions()}
               value={inputUnit}
@@ -460,6 +453,13 @@ const styles = css.create({
     "@media (max-width: 640px)": {
       gap: "6px",
     },
+  },
+  inputColumn: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "12px",
   },
   separator: {
     fontSize: "1.5rem",

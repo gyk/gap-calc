@@ -1,4 +1,5 @@
 import { css, html } from "react-strict-dom";
+import { useIsMobile } from "../hooks/useIsMobile";
 import { useGapStore } from "../store/useGapStore";
 import type { RiseUnit, RunUnit, VertSpeedUnit } from "../types/gap";
 import { DigitDial } from "./DigitDial";
@@ -7,6 +8,7 @@ import { HillIndicator } from "./HillIndicator";
 import { UnitSelector } from "./UnitSelector";
 
 export function InclineInput() {
+  const isMobile = useIsMobile();
   const {
     unitSystem,
     hillInputMode,
@@ -57,7 +59,7 @@ export function InclineInput() {
   };
 
   const renderGradeInput = () => (
-    <html.div style={styles.gradeRow}>
+    <html.div style={isMobile ? styles.columnCenter : styles.gradeRow}>
       <HillIndicator isUphill={isUphill} onToggle={toggleDirection} />
       <GradeArrowButtons
         value={gradeInput.percent}
@@ -92,7 +94,7 @@ export function InclineInput() {
       <html.div style={styles.row}>
         <HillIndicator isUphill={isUphill} onToggle={toggleDirection} />
         <html.div style={styles.riseRunContainer}>
-          <html.div style={styles.row}>
+          <html.div style={isMobile ? styles.columnCenter : styles.row}>
             <DigitDial
               label="Rise"
               value={riseRunInput.rise}
@@ -126,7 +128,7 @@ export function InclineInput() {
               }
             />
           </html.div>
-          <html.div style={styles.row}>
+          <html.div style={isMobile ? styles.columnCenter : styles.row}>
             <DigitDial
               label="Run"
               value={riseRunInput.run}
@@ -225,6 +227,14 @@ const styles = css.create({
     display: "flex",
     flexDirection: "column",
     gap: "12px",
+  },
+  columnCenter: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "12px",
+    marginBottom: "8px",
   },
   riseRunContainer: {
     display: "flex",
