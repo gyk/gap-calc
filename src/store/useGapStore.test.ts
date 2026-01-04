@@ -115,4 +115,23 @@ describe("useGapStore", () => {
     expect(state.grade).toBeCloseTo(0.1005, 3);
     expect(state.gradeInput.percent).toBeCloseTo(10.05, 1);
   });
+
+  it("should correctly convert speed from mph to km/h without decimal overflow", () => {
+    const { setUnitSystem, setSpeedInput, setInputUnit } =
+      useGapStore.getState();
+
+    // Set to imperial and 3.7 mph
+    setUnitSystem("imperial");
+    setInputUnit("mph");
+    setSpeedInput(3, 7);
+
+    // Switch to metric
+    setUnitSystem("metric");
+    const state = useGapStore.getState();
+
+    // 3.7 mph = 5.9545728 km/h -> should be 6.0 km/h
+    expect(state.speedInput.whole).toBe(6);
+    expect(state.speedInput.decimal).toBe(0);
+    expect(state.speedInput.decimal).toBeLessThanOrEqual(9);
+  });
 });

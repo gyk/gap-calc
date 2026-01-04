@@ -69,10 +69,8 @@ const createInitialState = (): GapState => {
       onesSeconds: initialPace.seconds % 10,
     },
     speedInput: {
-      whole: Math.floor(INITIAL_SPEED_KMH),
-      decimal: Math.round(
-        (INITIAL_SPEED_KMH - Math.floor(INITIAL_SPEED_KMH)) * 10,
-      ),
+      whole: Math.floor(Math.round(INITIAL_SPEED_KMH * 10) / 10),
+      decimal: Math.round(INITIAL_SPEED_KMH * 10) % 10,
     },
     inputUnit: "km/h",
     calcMode: "pace",
@@ -166,8 +164,9 @@ const convertInputValues = (
     state.paceInput.onesSeconds = seconds % 10;
   } else {
     const speed = convertMSToSpeed(speedMS, newUnit);
-    state.speedInput.whole = Math.floor(speed);
-    state.speedInput.decimal = Math.round((speed - Math.floor(speed)) * 10);
+    const totalTenths = Math.round(speed * 10);
+    state.speedInput.whole = Math.floor(totalTenths / 10);
+    state.speedInput.decimal = totalTenths % 10;
   }
 };
 
@@ -242,15 +241,18 @@ export const useGapStore = create<GapState & GapActions>()(
       }),
     setPaceInput: (minutes, tens, ones) =>
       set((state) => {
-        state.paceInput.minutes = minutes;
-        state.paceInput.tensSeconds = tens;
-        state.paceInput.onesSeconds = ones;
+        const totalSeconds = minutes * 60 + tens * 10 + ones;
+        state.paceInput.minutes = Math.floor(totalSeconds / 60);
+        const remainingSeconds = totalSeconds % 60;
+        state.paceInput.tensSeconds = Math.floor(remainingSeconds / 10);
+        state.paceInput.onesSeconds = remainingSeconds % 10;
         syncVertSpeedFromGrade(state);
       }),
     setSpeedInput: (whole, decimal) =>
       set((state) => {
-        state.speedInput.whole = whole;
-        state.speedInput.decimal = decimal;
+        const totalTenths = whole * 10 + decimal;
+        state.speedInput.whole = Math.floor(totalTenths / 10);
+        state.speedInput.decimal = totalTenths % 10;
         syncVertSpeedFromGrade(state);
       }),
     setInputUnit: (unit) =>
