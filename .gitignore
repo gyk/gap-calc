@@ -3,3 +3,4 @@ react-strict-dom-vite-app/
 
 node_modules/
 dist/
+dev-dist/

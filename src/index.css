@@ -1,10 +1,21 @@
-@layer tailwind-base, priority1, priority2, priority3, priority4;
+@layer tw-base,
+  priority1,
+  priority2,
+  priority3,
+  priority4,
+  tw-components,
+  tw-utilities;
 
-@layer tailwind-base {
+@layer tw-base {
   @tailwind base;
 }
 
-@tailwind components;
-@tailwind utilities;
+@layer tw-components {
+  @tailwind components;
+}
+
+@layer tw-utilities {
+  @tailwind utilities;
+}
 
 @react-strict-dom;
