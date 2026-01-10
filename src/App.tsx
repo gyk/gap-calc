@@ -108,8 +108,13 @@ export default function App() {
     <html.div style={styles.container}>
       <html.div style={styles.card}>
         <html.h1 style={styles.title}>
-          <html.span style={styles.titleGrade}>Grade-adjusted</html.span> pace
-          calculator ↗️↘️↗️
+          <html.img src="/icon.svg" style={styles.logo} alt="App Icon" />
+          <html.div style={styles.titleText}>
+            <html.div>
+              <html.span style={styles.titleGrade}>Grade-adjusted</html.span>
+            </html.div>
+            <html.div>pace calculator ↗️↘️↗️</html.div>
+          </html.div>
         </html.h1>
         {/* Unit System Selector */}
         <UnitSelector<UnitSystem>
@@ -351,6 +356,11 @@ const styles = css.create({
     },
   },
   title: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "12px",
     fontSize: "2rem",
     fontWeight: "800",
     color: "#0f172a",
@@ -359,6 +369,15 @@ const styles = css.create({
     "@media (max-width: 640px)": {
       fontSize: "1.5rem",
       marginBottom: "16px",
+      gap: "8px",
+    },
+  },
+  logo: {
+    width: "128px",
+    height: "128px",
+    "@media (max-width: 640px)": {
+      width: "96px",
+      height: "96px",
     },
   },
   titleGrade: {
@@ -367,6 +386,12 @@ const styles = css.create({
     textDecorationColor: "#5f5f5f",
     textDecorationStyle: "double",
     display: "inline-block",
+  },
+  titleText: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    textAlign: "left",
   },
   topButtons: {
     display: "flex",
