@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { css, html } from "react-strict-dom";
+import { CollapsibleSection } from "./components/CollapsibleSection";
 import { DigitDial } from "./components/DigitDial";
 import { InclineInput } from "./components/InclineInput";
 import { OutputDisplay } from "./components/OutputDisplay";
@@ -40,6 +41,7 @@ export default function App() {
     hillInputMode,
     outputUnit,
     grade,
+    collapsedSections,
     setPaceInput,
     setSpeedInput,
     setInputUnit,
@@ -47,6 +49,7 @@ export default function App() {
     setHillInputMode,
     setOutputUnit,
     setUnitSystem,
+    toggleSectionCollapse,
   } = useGapStore();
 
   const [isPresetsOpen, setIsPresetsOpen] = useState(false);
@@ -116,35 +119,41 @@ export default function App() {
             <html.div>pace calculator ↗️↘️↗️</html.div>
           </html.div>
         </html.h1>
-        {/* Unit System Selector */}
-        <UnitSelector<UnitSystem>
-          label="Unit System"
-          options={
-            isMobile ? ["metric", "imperial"] : ["metric", "imperial", "both"]
+        {/* Settings */}
+        <CollapsibleSection
+          title="Settings"
+          isCollapsed={collapsedSections.settings}
+          onToggle={() => toggleSectionCollapse("settings")}
+          rightContent={
+            <html.button
+              style={styles.presetButton}
+              onClick={() => setIsPresetsOpen(true)}
+            >
+              📋 Treadmill Presets
+            </html.button>
           }
-          value={unitSystem}
-          onChange={setUnitSystem}
-        />
+        >
+          {/* Unit System Selector */}
+          <UnitSelector<UnitSystem>
+            label="Unit System"
+            options={
+              isMobile ? ["metric", "imperial"] : ["metric", "imperial", "both"]
+            }
+            value={unitSystem}
+            onChange={setUnitSystem}
+          />
 
-        {/* Calculation Mode */}
-        <UnitSelector<CalcMode>
-          label="Calculation Mode"
-          options={["pace", "effort"]}
-          value={calcMode}
-          onChange={setCalcMode}
-          renderOption={(opt) =>
-            opt === "pace" ? "Incline → Flat" : "Flat → Incline"
-          }
-        />
-
-        <html.div style={styles.topButtons}>
-          <html.button
-            style={styles.presetButton}
-            onClick={() => setIsPresetsOpen(true)}
-          >
-            📋 Treadmill Presets
-          </html.button>
-        </html.div>
+          {/* Calculation Mode */}
+          <UnitSelector<CalcMode>
+            label="Calculation Mode"
+            options={["pace", "effort"]}
+            value={calcMode}
+            onChange={setCalcMode}
+            renderOption={(opt) =>
+              opt === "pace" ? "Incline → Flat" : "Flat → Incline"
+            }
+          />
+        </CollapsibleSection>
 
         {/* Speed/Pace Input Section */}
         <html.div style={styles.section}>
@@ -256,31 +265,34 @@ export default function App() {
                 </>
               )}
             </html.div>
-            <UnitSelector<PaceUnit>
-              options={getInputUnitOptions()}
-              value={inputUnit}
-              onChange={setInputUnit}
-            />
+            {!collapsedSections.settings && (
+              <UnitSelector<PaceUnit>
+                options={getInputUnitOptions()}
+                value={inputUnit}
+                onChange={setInputUnit}
+              />
+            )}
           </html.div>
         </html.div>
 
         {/* Hill Section */}
         <html.div style={styles.section}>
           <html.div style={styles.sectionTitle}>Incline</html.div>
-
-          <UnitSelector<HillInputMode>
-            options={["grade", "angle", "rise/run", "vert speed"]}
-            value={hillInputMode}
-            onChange={setHillInputMode}
-            nowrap={false}
-            renderOption={(opt) => {
-              if (isMobile) {
-                if (opt === "rise/run") return "rise";
-                if (opt === "vert speed") return "v.spd";
-              }
-              return opt;
-            }}
-          />
+          {!collapsedSections.settings && (
+            <UnitSelector<HillInputMode>
+              options={["grade", "angle", "rise/run", "vert speed"]}
+              value={hillInputMode}
+              onChange={setHillInputMode}
+              nowrap={false}
+              renderOption={(opt) => {
+                if (isMobile) {
+                  if (opt === "rise/run") return "rise";
+                  if (opt === "vert speed") return "v.spd";
+                }
+                return opt;
+              }}
+            />
+          )}
 
           <InclineInput />
 
@@ -298,14 +310,16 @@ export default function App() {
 
         {/* Output Section */}
         <html.div style={styles.section}>
-          <html.div style={styles.sectionHeader}>
-            <html.div style={styles.sectionTitle}>Output Unit</html.div>
-            <UnitSelector<PaceUnit>
-              options={getOutputUnitOptions()}
-              value={outputUnit}
-              onChange={setOutputUnit}
-            />
-          </html.div>
+          {!collapsedSections.settings && (
+            <html.div style={styles.sectionHeader}>
+              <html.div style={styles.sectionTitle}>Output Unit</html.div>
+              <UnitSelector<PaceUnit>
+                options={getOutputUnitOptions()}
+                value={outputUnit}
+                onChange={setOutputUnit}
+              />
+            </html.div>
+          )}
           <OutputDisplay />
         </html.div>
       </html.div>
@@ -405,8 +419,8 @@ const styles = css.create({
     borderWidth: "1px",
     borderColor: "#e2e8f0",
     borderRadius: "12px",
-    padding: "8px 16px",
-    fontSize: "0.9rem",
+    padding: "7px 14px",
+    fontSize: "0.8rem",
     fontWeight: "600",
     color: "#475569",
     cursor: "pointer",
@@ -458,8 +472,8 @@ const styles = css.create({
     flex: 1,
   },
   section: {
-    marginTop: "24px",
-    paddingTop: "24px",
+    marginTop: "20px",
+    paddingTop: "20px",
     borderTopWidth: "1px",
     borderColor: "#f1f5f9",
   },

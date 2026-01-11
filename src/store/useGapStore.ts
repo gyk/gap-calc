@@ -38,6 +38,7 @@ interface GapActions {
   setVertSpeedInput: (value: number, unit: VertSpeedUnit) => void;
   setOutputUnit: (unit: PaceUnit) => void;
   applyPreset: (inclinePercent: number, speedMph: number) => void;
+  toggleSectionCollapse: (section: "settings" | "speed" | "incline") => void;
   reset: () => void;
 }
 
@@ -88,6 +89,11 @@ const createInitialState = (): GapState => {
     },
     vertSpeedInput: { value: initialVertSpeedMhr, unit: "m/hr" },
     outputUnit: "/km",
+    collapsedSections: {
+      settings: false,
+      speed: false,
+      incline: false,
+    },
   };
 };
 
@@ -411,6 +417,10 @@ export const useGapStore = create<GapState & GapActions>()(
         state.speedInput.decimal = totalTenths % 10;
 
         syncVertSpeedFromGrade(state);
+      }),
+    toggleSectionCollapse: (section) =>
+      set((state) => {
+        state.collapsedSections[section] = !state.collapsedSections[section];
       }),
     reset: () =>
       set((state) => {

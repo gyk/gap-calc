@@ -97,6 +97,13 @@ export interface GapState {
 
   // Output settings
   outputUnit: PaceUnit;
+
+  // Section collapse state
+  collapsedSections: {
+    settings: boolean;
+    speed: boolean;
+    incline: boolean;
+  };
 }
 
 /** Result of GAP calculation */

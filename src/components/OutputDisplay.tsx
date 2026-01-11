@@ -100,7 +100,6 @@ const styles = css.create({
     padding: "24px",
     backgroundColor: "#1e293b",
     borderRadius: "16px",
-    marginTop: "24px",
     width: "100%",
     maxWidth: "440px",
     boxShadow:
