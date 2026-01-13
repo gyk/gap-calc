@@ -188,18 +188,11 @@ export const useGapStore = create<GapState & GapActions>()(
 
         if (system === "metric" && oldSystem !== "metric") {
           // Convert rise/run
-          if (state.riseRunInput.riseUnit === "feet") {
-            state.riseRunInput.rise = Math.round(
-              state.riseRunInput.rise * 0.3048,
-            );
-            state.riseRunInput.riseUnit = "meters";
-          }
-          if (state.riseRunInput.runUnit === "mi") {
-            state.riseRunInput.run = Number(
-              (state.riseRunInput.run * 1.609344).toFixed(2),
-            );
-            state.riseRunInput.runUnit = "km";
-          }
+          state.riseRunInput.riseUnit = "meters";
+          state.riseRunInput.runUnit = "km";
+          state.riseRunInput.run = 1;
+          state.riseRunInput.rise = Math.round(1000 * state.grade);
+
           // Convert vert speed
           if (state.vertSpeedInput.unit === "ft/hr") {
             state.vertSpeedInput.value = Math.round(
@@ -217,18 +210,11 @@ export const useGapStore = create<GapState & GapActions>()(
           else if (state.outputUnit === "mph") state.outputUnit = "km/h";
         } else if (system === "imperial" && oldSystem !== "imperial") {
           // Convert rise/run
-          if (state.riseRunInput.riseUnit === "meters") {
-            state.riseRunInput.rise = Math.round(
-              state.riseRunInput.rise / 0.3048,
-            );
-            state.riseRunInput.riseUnit = "feet";
-          }
-          if (state.riseRunInput.runUnit === "km") {
-            state.riseRunInput.run = Number(
-              (state.riseRunInput.run / 1.609344).toFixed(2),
-            );
-            state.riseRunInput.runUnit = "mi";
-          }
+          state.riseRunInput.riseUnit = "feet";
+          state.riseRunInput.runUnit = "mi";
+          state.riseRunInput.run = 1;
+          state.riseRunInput.rise = Math.round(5280 * state.grade);
+
           // Convert vert speed
           if (state.vertSpeedInput.unit === "m/hr") {
             state.vertSpeedInput.value = Math.round(

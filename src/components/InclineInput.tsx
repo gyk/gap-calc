@@ -73,122 +73,169 @@ export function InclineInput() {
     </html.div>
   );
 
-  const renderAngleInput = () => (
-    <html.div style={styles.row}>
-      <HillIndicator isUphill={isUphill} onToggle={toggleDirection} />
-      <DigitDial
-        label="Degrees"
-        value={angleInput.degrees.toFixed(1)}
-        onIncrement={() =>
-          setAngleInput(Number((angleInput.degrees + 0.1).toFixed(1)))
-        }
-        onDecrement={() =>
-          setAngleInput(Number((angleInput.degrees - 0.1).toFixed(1)))
-        }
-      />
-    </html.div>
-  );
+  const renderAngleInput = () => {
+    const absDegrees = Math.abs(angleInput.degrees);
+    const sign = angleInput.degrees >= 0 ? 1 : -1;
+    const whole = Math.floor(absDegrees);
+    const decimal = Math.round((absDegrees - whole) * 10);
 
-  const renderRiseRunInput = () => (
-    <html.div style={styles.column}>
+    const updateAngle = (newWhole: number, newDecimal: number) => {
+      const newAbs = newWhole + newDecimal / 10;
+      setAngleInput(newAbs * sign);
+    };
+
+    return (
       <html.div style={styles.row}>
         <HillIndicator isUphill={isUphill} onToggle={toggleDirection} />
-        <html.div style={styles.riseRunContainer}>
-          <html.div style={isMobile ? styles.columnCenter : styles.row}>
-            <DigitDial
-              label="Rise"
-              value={riseRunInput.rise}
-              onIncrement={() =>
-                setRiseRunInput(
-                  riseRunInput.rise + 1,
-                  riseRunInput.run,
-                  riseRunInput.riseUnit,
-                  riseRunInput.runUnit,
-                )
-              }
-              onDecrement={() =>
-                setRiseRunInput(
-                  riseRunInput.rise - 1,
-                  riseRunInput.run,
-                  riseRunInput.riseUnit,
-                  riseRunInput.runUnit,
-                )
-              }
-            />
-            <UnitSelector<RiseUnit>
-              options={getRiseUnitOptions()}
-              value={riseRunInput.riseUnit}
-              onChange={(unit) =>
-                setRiseRunInput(
-                  riseRunInput.rise,
-                  riseRunInput.run,
-                  unit,
-                  riseRunInput.runUnit,
-                )
-              }
-            />
-          </html.div>
-          <html.div style={isMobile ? styles.columnCenter : styles.row}>
-            <DigitDial
-              label="Run"
-              value={riseRunInput.run}
-              onIncrement={() =>
-                setRiseRunInput(
-                  riseRunInput.rise,
-                  riseRunInput.run + 1,
-                  riseRunInput.riseUnit,
-                  riseRunInput.runUnit,
-                )
-              }
-              onDecrement={() =>
-                setRiseRunInput(
-                  riseRunInput.rise,
-                  riseRunInput.run - 1,
-                  riseRunInput.riseUnit,
-                  riseRunInput.runUnit,
-                )
-              }
-            />
-            <UnitSelector<RunUnit>
-              options={getRunUnitOptions()}
-              value={riseRunInput.runUnit}
-              onChange={(unit) =>
-                setRiseRunInput(
-                  riseRunInput.rise,
-                  riseRunInput.run,
-                  riseRunInput.riseUnit,
-                  unit,
-                )
-              }
-            />
+        <html.div style={styles.dialRow}>
+          <DigitDial
+            label="Deg"
+            value={whole}
+            onIncrement={() => updateAngle(whole + 1, decimal)}
+            onDecrement={() => updateAngle(Math.max(0, whole - 1), decimal)}
+          />
+          <html.div style={styles.separator}>.</html.div>
+          <DigitDial
+            label=".1"
+            value={decimal}
+            onIncrement={() => updateAngle(whole, (decimal + 1) % 10)}
+            onDecrement={() => updateAngle(whole, (decimal + 9) % 10)}
+          />
+        </html.div>
+      </html.div>
+    );
+  };
+
+  const renderRiseRunInput = () => {
+    const absRise = Math.abs(riseRunInput.rise);
+    const riseSign = riseRunInput.rise >= 0 ? 1 : -1;
+
+    const runVal = riseRunInput.run;
+    const runWhole = Math.floor(runVal);
+    const runDecimal = Math.round((runVal - runWhole) * 10);
+
+    const updateRun = (newWhole: number, newDecimal: number) => {
+      const newRun = newWhole + newDecimal / 10;
+      // Prevent run from being 0
+      if (newRun === 0) return;
+      setRiseRunInput(
+        riseRunInput.rise,
+        Number(newRun.toFixed(1)),
+        riseRunInput.riseUnit,
+        riseRunInput.runUnit,
+      );
+    };
+
+    const updateRise = (newAbsRise: number) => {
+      setRiseRunInput(
+        newAbsRise * riseSign,
+        riseRunInput.run,
+        riseRunInput.riseUnit,
+        riseRunInput.runUnit,
+      );
+    };
+
+    return (
+      <html.div style={styles.column}>
+        <html.div style={styles.row}>
+          <HillIndicator isUphill={isUphill} onToggle={toggleDirection} />
+          <html.div style={styles.riseRunContainer}>
+            <html.div style={isMobile ? styles.columnCenter : styles.row}>
+              <DigitDial
+                label="Rise"
+                value={absRise}
+                onIncrement={() => updateRise(absRise + 1)}
+                onDecrement={() => updateRise(Math.max(0, absRise - 1))}
+              />
+              <UnitSelector<RiseUnit>
+                options={getRiseUnitOptions()}
+                value={riseRunInput.riseUnit}
+                onChange={(unit) =>
+                  setRiseRunInput(
+                    riseRunInput.rise,
+                    riseRunInput.run,
+                    unit,
+                    riseRunInput.runUnit,
+                  )
+                }
+              />
+            </html.div>
+            <html.div style={isMobile ? styles.columnCenter : styles.dialRow}>
+              <html.div style={styles.dialRow}>
+                <DigitDial
+                  label="Run"
+                  value={runWhole}
+                  onIncrement={() => updateRun(runWhole + 1, runDecimal)}
+                  onDecrement={() =>
+                    updateRun(Math.max(0, runWhole - 1), runDecimal)
+                  }
+                />
+                <html.div style={styles.separator}>.</html.div>
+                <DigitDial
+                  label=".1"
+                  value={runDecimal}
+                  onIncrement={() => updateRun(runWhole, (runDecimal + 1) % 10)}
+                  onDecrement={() => updateRun(runWhole, (runDecimal + 9) % 10)}
+                />
+              </html.div>
+              <UnitSelector<RunUnit>
+                options={getRunUnitOptions()}
+                value={riseRunInput.runUnit}
+                onChange={(unit) =>
+                  setRiseRunInput(
+                    riseRunInput.rise,
+                    riseRunInput.run,
+                    riseRunInput.riseUnit,
+                    unit,
+                  )
+                }
+              />
+            </html.div>
           </html.div>
         </html.div>
       </html.div>
-    </html.div>
-  );
+    );
+  };
 
-  const renderVertSpeedInput = () => (
-    <html.div style={styles.column}>
-      <html.div style={styles.row}>
-        <HillIndicator isUphill={isUphill} onToggle={toggleDirection} />
-        <DigitDial
-          label="Vert Speed"
-          value={vertSpeedInput.value}
-          onIncrement={() =>
-            setVertSpeedInput(vertSpeedInput.value + 50, vertSpeedInput.unit)
-          }
-          onDecrement={() =>
-            setVertSpeedInput(vertSpeedInput.value - 50, vertSpeedInput.unit)
-          }
-        />
-        <UnitSelector<VertSpeedUnit>
-          options={getVertSpeedUnitOptions()}
-          value={vertSpeedInput.unit}
-          onChange={(unit) => setVertSpeedInput(vertSpeedInput.value, unit)}
-        />
+  const renderVertSpeedInput = () => {
+    const value = vertSpeedInput.value;
+    const hundreds = Math.floor(value / 100);
+    const ones = value % 100;
+
+    const updateVertSpeed = (newHundreds: number, newOnes: number) => {
+      const newValue = newHundreds * 100 + newOnes;
+      setVertSpeedInput(newValue, vertSpeedInput.unit);
+    };
+
+    return (
+      <html.div style={styles.column}>
+        <html.div style={styles.row}>
+          <HillIndicator isUphill={isUphill} onToggle={toggleDirection} />
+          <html.div style={styles.dialRow}>
+            <DigitDial
+              label="100"
+              value={hundreds}
+              onIncrement={() => updateVertSpeed(hundreds + 1, ones)}
+              onDecrement={() =>
+                updateVertSpeed(Math.max(0, hundreds - 1), ones)
+              }
+            />
+            <DigitDial
+              label="Vert Speed"
+              value={ones.toString().padStart(2, "0")}
+              onIncrement={() => updateVertSpeed(hundreds, (ones + 1) % 100)}
+              onDecrement={() => updateVertSpeed(hundreds, (ones + 99) % 100)}
+            />
+          </html.div>
+          <UnitSelector<VertSpeedUnit>
+            options={getVertSpeedUnitOptions()}
+            value={vertSpeedInput.unit}
+            onChange={(unit) => setVertSpeedInput(vertSpeedInput.value, unit)}
+          />
+        </html.div>
       </html.div>
-    </html.div>
-  );
+    );
+  };
 
   return (
     <html.div style={styles.container}>
@@ -251,5 +298,17 @@ const styles = css.create({
     "@media (max-width: 640px)": {
       gap: "8px",
     },
+  },
+  dialRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  separator: {
+    fontSize: "1.5rem",
+    fontWeight: "800",
+    color: "#007bff",
+    marginHorizontal: "2px",
+    paddingTop: "24px",
   },
 });
