@@ -28,7 +28,7 @@ export default defineConfig(() => ({
     }),
     babel(),
     VitePWA({
-      registerType: "autoUpdate",
+      registerType: "prompt",
       includeAssets: ["icon.svg"],
       devOptions: {
         enabled: true,

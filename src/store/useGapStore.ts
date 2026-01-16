@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
+import { persist } from "zustand/middleware";
 import {
   calculateGradeFromRiseRun,
   convertMSToPace,
@@ -7,6 +8,8 @@ import {
   convertPaceToMS,
   convertSpeedToMS,
 } from "../logic/gapLogic";
+import { DEFAULT_GRADE, DEFAULT_SPEED_KMH } from "../logic/presets";
+import { KM_PER_MILE } from "../constants";
 import type {
   CalcMode,
   GapState,
@@ -45,8 +48,8 @@ interface GapActions {
 const MAX_GRADE = 0.5;
 
 const createInitialState = (): GapState => {
-  const INITIAL_SPEED_KMH = 6;
-  const INITIAL_GRADE = 0.03;
+  const INITIAL_SPEED_KMH = DEFAULT_SPEED_KMH;
+  const INITIAL_GRADE = DEFAULT_GRADE;
   const INITIAL_UNIT_SYSTEM: UnitSystem = "metric";
 
   const initialSpeedMS = convertSpeedToMS(INITIAL_SPEED_KMH, "km/h");
@@ -178,239 +181,245 @@ const convertInputValues = (
 };
 
 export const useGapStore = create<GapState & GapActions>()(
-  immer((set) => ({
-    ...initialState,
+  persist(
+    immer((set) => ({
+      ...initialState,
 
-    setUnitSystem: (system) =>
-      set((state) => {
-        const oldSystem = state.unitSystem;
-        state.unitSystem = system;
+      setUnitSystem: (system) =>
+        set((state) => {
+          const oldSystem = state.unitSystem;
+          state.unitSystem = system;
 
-        if (system === "metric" && oldSystem !== "metric") {
-          // Convert rise/run
-          state.riseRunInput.riseUnit = "meters";
-          state.riseRunInput.runUnit = "km";
-          state.riseRunInput.run = 1;
-          state.riseRunInput.rise = Math.round(1000 * state.grade);
+          if (system === "metric" && oldSystem !== "metric") {
+            // Convert rise/run
+            state.riseRunInput.riseUnit = "meters";
+            state.riseRunInput.runUnit = "km";
+            state.riseRunInput.run = 1;
+            state.riseRunInput.rise = Math.round(1000 * state.grade);
 
-          // Convert vert speed
-          if (state.vertSpeedInput.unit === "ft/hr") {
-            state.vertSpeedInput.value = Math.round(
-              state.vertSpeedInput.value * 0.3048,
-            );
-            state.vertSpeedInput.unit = "m/hr";
-          }
-          // Update default units if they were imperial
-          if (state.inputUnit === "/mi")
-            convertInputValues(state, "/mi", "/km");
-          else if (state.inputUnit === "mph")
-            convertInputValues(state, "mph", "km/h");
-
-          if (state.outputUnit === "/mi") state.outputUnit = "/km";
-          else if (state.outputUnit === "mph") state.outputUnit = "km/h";
-        } else if (system === "imperial" && oldSystem !== "imperial") {
-          // Convert rise/run
-          state.riseRunInput.riseUnit = "feet";
-          state.riseRunInput.runUnit = "mi";
-          state.riseRunInput.run = 1;
-          state.riseRunInput.rise = Math.round(5280 * state.grade);
-
-          // Convert vert speed
-          if (state.vertSpeedInput.unit === "m/hr") {
-            state.vertSpeedInput.value = Math.round(
-              state.vertSpeedInput.value / 0.3048,
-            );
-            state.vertSpeedInput.unit = "ft/hr";
-          }
-          // Update default units if they were metric
-          if (state.inputUnit === "/km")
-            convertInputValues(state, "/km", "/mi");
-          else if (state.inputUnit === "km/h")
-            convertInputValues(state, "km/h", "mph");
-
-          if (state.outputUnit === "/km") state.outputUnit = "/mi";
-          else if (state.outputUnit === "km/h") state.outputUnit = "mph";
-        }
-      }),
-    setPaceInput: (minutes, tens, ones) =>
-      set((state) => {
-        const totalSeconds = minutes * 60 + tens * 10 + ones;
-        state.paceInput.minutes = Math.floor(totalSeconds / 60);
-        const remainingSeconds = totalSeconds % 60;
-        state.paceInput.tensSeconds = Math.floor(remainingSeconds / 10);
-        state.paceInput.onesSeconds = remainingSeconds % 10;
-        syncVertSpeedFromGrade(state);
-      }),
-    setSpeedInput: (whole, decimal) =>
-      set((state) => {
-        const totalTenths = whole * 10 + decimal;
-        state.speedInput.whole = Math.floor(totalTenths / 10);
-        state.speedInput.decimal = totalTenths % 10;
-        syncVertSpeedFromGrade(state);
-      }),
-    setInputUnit: (unit) =>
-      set((state) => {
-        convertInputValues(state, state.inputUnit, unit);
-        syncVertSpeedFromGrade(state);
-      }),
-    setCalcMode: (mode) =>
-      set((state) => {
-        state.calcMode = mode;
-      }),
-    setHillDirection: (direction) =>
-      set((state) => {
-        if (state.hillDirection === direction) return;
-        state.hillDirection = direction;
-
-        // Negate values to match new direction
-        state.grade = -state.grade;
-        updateHillInputsFromGrade(state);
-      }),
-    setHillInputMode: (mode) =>
-      set((state) => {
-        state.hillInputMode = mode;
-      }),
-    setGradeInput: (percent) =>
-      set((state) => {
-        const absGrade = Math.min(Math.abs(percent) / 100, MAX_GRADE);
-        const grade = percent < 0 ? -absGrade : absGrade;
-        state.grade = grade;
-        updateHillInputsFromGrade(state);
-      }),
-    setAngleInput: (degrees) =>
-      set((state) => {
-        const rad = (degrees * Math.PI) / 180;
-        let grade = Math.tan(rad);
-        if (Math.abs(grade) > MAX_GRADE) {
-          grade = grade < 0 ? -MAX_GRADE : MAX_GRADE;
-        }
-        state.grade = grade;
-        updateHillInputsFromGrade(state);
-      }),
-    setRiseRunInput: (rise, run, riseUnit, runUnit) =>
-      set((state) => {
-        let newRise = rise;
-        let newRun = run;
-
-        // If units changed, convert values to keep grade the same
-        if (state.riseRunInput.riseUnit !== riseUnit) {
-          if (riseUnit === "feet") newRise = Math.round(rise / 0.3048);
-          else newRise = Math.round(rise * 0.3048);
-        }
-        if (state.riseRunInput.runUnit !== runUnit) {
-          if (runUnit === "mi") newRun = Number((run / 1.609344).toFixed(2));
-          else newRun = Number((run * 1.609344).toFixed(2));
-        }
-
-        let grade = calculateGradeFromRiseRun(
-          newRise,
-          newRun,
-          riseUnit,
-          runUnit,
-        );
-        if (Math.abs(grade) > MAX_GRADE) {
-          grade = grade < 0 ? -MAX_GRADE : MAX_GRADE;
-          // Adjust rise to match MAX_GRADE
-          const runMeters =
-            runUnit === "mi" ? newRun * 1609.344 : newRun * 1000;
-          const maxRiseMeters = runMeters * grade;
-          newRise =
-            riseUnit === "feet"
-              ? Math.round(maxRiseMeters / 0.3048)
-              : Math.round(maxRiseMeters);
-        }
-
-        state.riseRunInput.rise = newRise;
-        state.riseRunInput.run = newRun;
-        state.riseRunInput.riseUnit = riseUnit;
-        state.riseRunInput.runUnit = runUnit;
-
-        state.grade = grade;
-        updateHillInputsFromGrade(state);
-      }),
-    setVertSpeedInput: (value, unit) =>
-      set((state) => {
-        let newValue = value;
-        if (state.vertSpeedInput.unit !== unit) {
-          if (unit === "ft/hr") newValue = Math.round(value / 0.3048);
-          else newValue = Math.round(value * 0.3048);
-        }
-        state.vertSpeedInput.value = newValue;
-        state.vertSpeedInput.unit = unit;
-
-        const speedMS = getCurrentSpeedMS(state);
-        const vertSpeedMS =
-          unit === "m/hr" ? newValue / 3600 : (newValue * 0.3048) / 3600;
-
-        if (speedMS > 0) {
-          if (Math.abs(vertSpeedMS) < speedMS) {
-            const angleRad = Math.asin(vertSpeedMS / speedMS);
-            let grade = Math.tan(angleRad);
-            if (Math.abs(grade) > MAX_GRADE) {
-              grade = grade < 0 ? -MAX_GRADE : MAX_GRADE;
+            // Convert vert speed
+            if (state.vertSpeedInput.unit === "ft/hr") {
+              state.vertSpeedInput.value = Math.round(
+                state.vertSpeedInput.value * 0.3048,
+              );
+              state.vertSpeedInput.unit = "m/hr";
             }
-            state.grade = grade;
-          } else {
-            state.grade = vertSpeedMS >= 0 ? MAX_GRADE : -MAX_GRADE;
+            // Update default units if they were imperial
+            if (state.inputUnit === "/mi")
+              convertInputValues(state, "/mi", "/km");
+            else if (state.inputUnit === "mph")
+              convertInputValues(state, "mph", "km/h");
+
+            if (state.outputUnit === "/mi") state.outputUnit = "/km";
+            else if (state.outputUnit === "mph") state.outputUnit = "km/h";
+          } else if (system === "imperial" && oldSystem !== "imperial") {
+            // Convert rise/run
+            state.riseRunInput.riseUnit = "feet";
+            state.riseRunInput.runUnit = "mi";
+            state.riseRunInput.run = 1;
+            state.riseRunInput.rise = Math.round(5280 * state.grade);
+
+            // Convert vert speed
+            if (state.vertSpeedInput.unit === "m/hr") {
+              state.vertSpeedInput.value = Math.round(
+                state.vertSpeedInput.value / 0.3048,
+              );
+              state.vertSpeedInput.unit = "ft/hr";
+            }
+            // Update default units if they were metric
+            if (state.inputUnit === "/km")
+              convertInputValues(state, "/km", "/mi");
+            else if (state.inputUnit === "km/h")
+              convertInputValues(state, "km/h", "mph");
+
+            if (state.outputUnit === "/km") state.outputUnit = "/mi";
+            else if (state.outputUnit === "km/h") state.outputUnit = "mph";
           }
-        }
+        }),
+      setPaceInput: (minutes, tens, ones) =>
+        set((state) => {
+          const totalSeconds = minutes * 60 + tens * 10 + ones;
+          state.paceInput.minutes = Math.floor(totalSeconds / 60);
+          const remainingSeconds = totalSeconds % 60;
+          state.paceInput.tensSeconds = Math.floor(remainingSeconds / 10);
+          state.paceInput.onesSeconds = remainingSeconds % 10;
+          syncVertSpeedFromGrade(state);
+        }),
+      setSpeedInput: (whole, decimal) =>
+        set((state) => {
+          const totalTenths = whole * 10 + decimal;
+          state.speedInput.whole = Math.floor(totalTenths / 10);
+          state.speedInput.decimal = totalTenths % 10;
+          syncVertSpeedFromGrade(state);
+        }),
+      setInputUnit: (unit) =>
+        set((state) => {
+          convertInputValues(state, state.inputUnit, unit);
+          syncVertSpeedFromGrade(state);
+        }),
+      setCalcMode: (mode) =>
+        set((state) => {
+          state.calcMode = mode;
+        }),
+      setHillDirection: (direction) =>
+        set((state) => {
+          if (state.hillDirection === direction) return;
+          state.hillDirection = direction;
 
-        // Sync other hill inputs from state.grade
-        const grade = state.grade;
-        state.gradeInput.percent = Number((grade * 100).toFixed(2));
-        state.angleInput.degrees = Number(
-          ((Math.atan(grade) * 180) / Math.PI).toFixed(2),
-        );
+          // Negate values to match new direction
+          state.grade = -state.grade;
+          updateHillInputsFromGrade(state);
+        }),
+      setHillInputMode: (mode) =>
+        set((state) => {
+          state.hillInputMode = mode;
+        }),
+      setGradeInput: (percent) =>
+        set((state) => {
+          const absGrade = Math.min(Math.abs(percent) / 100, MAX_GRADE);
+          const grade = percent < 0 ? -absGrade : absGrade;
+          state.grade = grade;
+          updateHillInputsFromGrade(state);
+        }),
+      setAngleInput: (degrees) =>
+        set((state) => {
+          const rad = (degrees * Math.PI) / 180;
+          let grade = Math.tan(rad);
+          if (Math.abs(grade) > MAX_GRADE) {
+            grade = grade < 0 ? -MAX_GRADE : MAX_GRADE;
+          }
+          state.grade = grade;
+          updateHillInputsFromGrade(state);
+        }),
+      setRiseRunInput: (rise, run, riseUnit, runUnit) =>
+        set((state) => {
+          let newRise = rise;
+          let newRun = run;
 
-        const runMeters =
-          state.riseRunInput.runUnit === "mi"
-            ? state.riseRunInput.run * 1609.344
-            : state.riseRunInput.run * 1000;
-        const riseMeters = runMeters * grade;
-        state.riseRunInput.rise =
-          state.riseRunInput.riseUnit === "feet"
-            ? Math.round(riseMeters / 0.3048)
-            : Math.round(riseMeters);
+          // If units changed, convert values to keep grade the same
+          if (state.riseRunInput.riseUnit !== riseUnit) {
+            if (riseUnit === "feet") newRise = Math.round(rise / 0.3048);
+            else newRise = Math.round(rise * 0.3048);
+          }
+          if (state.riseRunInput.runUnit !== runUnit) {
+            if (runUnit === "mi")
+              newRun = Number((run / KM_PER_MILE).toFixed(2));
+            else newRun = Number((run * KM_PER_MILE).toFixed(2));
+          }
 
-        state.hillDirection = grade >= 0 ? "uphill" : "downhill";
-      }),
-    setOutputUnit: (unit) =>
-      set((state) => {
-        state.outputUnit = unit;
-      }),
-    applyPreset: (inclinePercent, speedMph) =>
-      set((state) => {
-        // Set grade
-        const grade = inclinePercent / 100;
-        state.grade = grade;
-        updateHillInputsFromGrade(state);
+          let grade = calculateGradeFromRiseRun(
+            newRise,
+            newRun,
+            riseUnit,
+            runUnit,
+          );
+          if (Math.abs(grade) > MAX_GRADE) {
+            grade = grade < 0 ? -MAX_GRADE : MAX_GRADE;
+            // Adjust rise to match MAX_GRADE
+            const runMeters =
+              runUnit === "mi" ? newRun * 1609.344 : newRun * 1000;
+            const maxRiseMeters = runMeters * grade;
+            newRise =
+              riseUnit === "feet"
+                ? Math.round(maxRiseMeters / 0.3048)
+                : Math.round(maxRiseMeters);
+          }
 
-        // Set speed
-        // If current unit system is metric, convert speedMph to km/h
-        let targetSpeed = speedMph;
-        let targetUnit: PaceUnit = "mph";
+          state.riseRunInput.rise = newRise;
+          state.riseRunInput.run = newRun;
+          state.riseRunInput.riseUnit = riseUnit;
+          state.riseRunInput.runUnit = runUnit;
 
-        if (state.unitSystem === "metric") {
-          targetSpeed = speedMph * 1.609344;
-          targetUnit = "km/h";
-        }
+          state.grade = grade;
+          updateHillInputsFromGrade(state);
+        }),
+      setVertSpeedInput: (value, unit) =>
+        set((state) => {
+          let newValue = value;
+          if (state.vertSpeedInput.unit !== unit) {
+            if (unit === "ft/hr") newValue = Math.round(value / 0.3048);
+            else newValue = Math.round(value * 0.3048);
+          }
+          state.vertSpeedInput.value = newValue;
+          state.vertSpeedInput.unit = unit;
 
-        // Update input unit to speed-based if it wasn't
-        state.inputUnit = targetUnit;
+          const speedMS = getCurrentSpeedMS(state);
+          const vertSpeedMS =
+            unit === "m/hr" ? newValue / 3600 : (newValue * 0.3048) / 3600;
 
-        const totalTenths = Math.round(targetSpeed * 10);
-        state.speedInput.whole = Math.floor(totalTenths / 10);
-        state.speedInput.decimal = totalTenths % 10;
+          if (speedMS > 0) {
+            if (Math.abs(vertSpeedMS) < speedMS) {
+              const angleRad = Math.asin(vertSpeedMS / speedMS);
+              let grade = Math.tan(angleRad);
+              if (Math.abs(grade) > MAX_GRADE) {
+                grade = grade < 0 ? -MAX_GRADE : MAX_GRADE;
+              }
+              state.grade = grade;
+            } else {
+              state.grade = vertSpeedMS >= 0 ? MAX_GRADE : -MAX_GRADE;
+            }
+          }
 
-        syncVertSpeedFromGrade(state);
-      }),
-    toggleSectionCollapse: (section) =>
-      set((state) => {
-        state.collapsedSections[section] = !state.collapsedSections[section];
-      }),
-    reset: () =>
-      set((state) => {
-        Object.assign(state, createInitialState());
-      }),
-  })),
+          // Sync other hill inputs from state.grade
+          const grade = state.grade;
+          state.gradeInput.percent = Number((grade * 100).toFixed(2));
+          state.angleInput.degrees = Number(
+            ((Math.atan(grade) * 180) / Math.PI).toFixed(2),
+          );
+
+          const runMeters =
+            state.riseRunInput.runUnit === "mi"
+              ? state.riseRunInput.run * 1609.344
+              : state.riseRunInput.run * 1000;
+          const riseMeters = runMeters * grade;
+          state.riseRunInput.rise =
+            state.riseRunInput.riseUnit === "feet"
+              ? Math.round(riseMeters / 0.3048)
+              : Math.round(riseMeters);
+
+          state.hillDirection = grade >= 0 ? "uphill" : "downhill";
+        }),
+      setOutputUnit: (unit) =>
+        set((state) => {
+          state.outputUnit = unit;
+        }),
+      applyPreset: (inclinePercent, speedMph) =>
+        set((state) => {
+          // Set grade
+          const grade = inclinePercent / 100;
+          state.grade = grade;
+          updateHillInputsFromGrade(state);
+
+          // Set speed
+          // If current unit system is metric, convert speedMph to km/h
+          let targetSpeed = speedMph;
+          let targetUnit: PaceUnit = "mph";
+
+          if (state.unitSystem === "metric") {
+            targetSpeed = speedMph * KM_PER_MILE;
+            targetUnit = "km/h";
+          }
+
+          // Update input unit to speed-based if it wasn't
+          state.inputUnit = targetUnit;
+
+          const totalTenths = Math.round(targetSpeed * 10);
+          state.speedInput.whole = Math.floor(totalTenths / 10);
+          state.speedInput.decimal = totalTenths % 10;
+
+          syncVertSpeedFromGrade(state);
+        }),
+      toggleSectionCollapse: (section) =>
+        set((state) => {
+          state.collapsedSections[section] = !state.collapsedSections[section];
+        }),
+      reset: () =>
+        set((state) => {
+          Object.assign(state, createInitialState());
+        }),
+    })),
+    {
+      name: "gap-calc-storage",
+    },
+  ),
 );

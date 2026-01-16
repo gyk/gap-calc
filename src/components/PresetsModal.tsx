@@ -1,5 +1,6 @@
 import { css, html } from "react-strict-dom";
 import { PRESETS, type Preset } from "../logic/presets";
+import { KM_PER_MILE } from "../constants";
 import { useGapStore } from "../store/useGapStore";
 
 interface PresetsModalProps {
@@ -8,12 +9,16 @@ interface PresetsModalProps {
 }
 
 export function PresetsModal({ isOpen, onClose }: PresetsModalProps) {
-  const { applyPreset, unitSystem } = useGapStore();
+  const { applyPreset, reset, unitSystem } = useGapStore();
 
   if (!isOpen) return null;
 
   const handleSelectPreset = (preset: Preset) => {
-    applyPreset(preset.inclinePercent, preset.speedMph);
+    if (preset.id === "default") {
+      reset();
+    } else {
+      applyPreset(preset.inclinePercent, preset.speedMph);
+    }
     onClose();
   };
 
@@ -35,13 +40,16 @@ export function PresetsModal({ isOpen, onClose }: PresetsModalProps) {
             >
               <html.div style={styles.presetInfo}>
                 <html.div style={styles.presetName}>{preset.name}</html.div>
-                <html.div style={styles.presetDescription}>
+                <html.div style={styles.presetMeta}>
                   {unitSystem === "metric"
-                    ? `${preset.inclinePercent}% incline, ${(
-                        preset.speedMph * 1.609344
-                      ).toFixed(1)}\u00A0km/h`
-                    : preset.description}
+                    ? `${preset.inclinePercent}% incline, ${(preset.speedMph * KM_PER_MILE).toFixed(1)}\u00A0km/h`
+                    : `${preset.inclinePercent}% incline, ${preset.speedMph.toFixed(1)}\u00A0mph`}
                 </html.div>
+                {preset.description ? (
+                  <html.div style={styles.presetDescription}>
+                    {preset.description}
+                  </html.div>
+                ) : null}
               </html.div>
             </html.button>
           ))}
@@ -130,8 +138,13 @@ const styles = css.create({
     color: "#007bff",
     marginBottom: 4,
   },
+  presetMeta: {
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 4,
+  },
   presetDescription: {
     fontSize: 14,
-    color: "#666",
+    color: "#333",
   },
 });

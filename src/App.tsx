@@ -129,7 +129,7 @@ export default function App() {
               style={styles.presetButton}
               onClick={() => setIsPresetsOpen(true)}
             >
-              📋 Treadmill Presets
+              📋 Presets
             </html.button>
           }
         >
@@ -233,7 +233,7 @@ export default function App() {
               ) : (
                 <>
                   <DigitDial
-                    label="Whole"
+                    label={inputUnit}
                     value={speedInput.whole}
                     onIncrement={() =>
                       setSpeedInput(speedInput.whole + 1, speedInput.decimal)
@@ -247,7 +247,7 @@ export default function App() {
                   />
                   <html.div style={styles.separator}>.</html.div>
                   <DigitDial
-                    label="Dec"
+                    label=".1"
                     value={speedInput.decimal}
                     onIncrement={() =>
                       setSpeedInput(
