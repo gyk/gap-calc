@@ -121,8 +121,8 @@ const syncVertSpeedFromGrade = (state: GapState) => {
   const vertSpeedMS = speedMS * Math.sin(Math.atan(state.grade));
   state.vertSpeedInput.value =
     state.vertSpeedInput.unit === "m/hr"
-      ? Math.round(vertSpeedMS * 3600)
-      : Math.round((vertSpeedMS * 3600) / 0.3048);
+      ? Math.round(Math.abs(vertSpeedMS) * 3600)
+      : Math.round((Math.abs(vertSpeedMS) * 3600) / 0.3048);
 };
 
 const updateHillInputsFromGrade = (state: GapState) => {
@@ -337,17 +337,21 @@ export const useGapStore = create<GapState & GapActions>()(
         }),
       setVertSpeedInput: (value, unit) =>
         set((state) => {
-          let newValue = value;
+          let newValue = Math.abs(value);
           if (state.vertSpeedInput.unit !== unit) {
-            if (unit === "ft/hr") newValue = Math.round(value / 0.3048);
-            else newValue = Math.round(value * 0.3048);
+            if (unit === "ft/hr") newValue = Math.round(newValue / 0.3048);
+            else newValue = Math.round(newValue * 0.3048);
           }
-          state.vertSpeedInput.value = newValue;
           state.vertSpeedInput.unit = unit;
 
           const speedMS = getCurrentSpeedMS(state);
-          const vertSpeedMS =
+          let vertSpeedMS =
             unit === "m/hr" ? newValue / 3600 : (newValue * 0.3048) / 3600;
+
+          // Vertical speed should reflect the hill direction
+          if (state.hillDirection === "downhill") {
+            vertSpeedMS = -vertSpeedMS;
+          }
 
           if (speedMS > 0) {
             if (Math.abs(vertSpeedMS) < speedMS) {
@@ -362,24 +366,7 @@ export const useGapStore = create<GapState & GapActions>()(
             }
           }
 
-          // Sync other hill inputs from state.grade
-          const grade = state.grade;
-          state.gradeInput.percent = Number((grade * 100).toFixed(2));
-          state.angleInput.degrees = Number(
-            ((Math.atan(grade) * 180) / Math.PI).toFixed(2),
-          );
-
-          const runMeters =
-            state.riseRunInput.runUnit === "mi"
-              ? state.riseRunInput.run * 1609.344
-              : state.riseRunInput.run * 1000;
-          const riseMeters = runMeters * grade;
-          state.riseRunInput.rise =
-            state.riseRunInput.riseUnit === "feet"
-              ? Math.round(riseMeters / 0.3048)
-              : Math.round(riseMeters);
-
-          state.hillDirection = grade >= 0 ? "uphill" : "downhill";
+          updateHillInputsFromGrade(state);
         }),
       setOutputUnit: (unit) =>
         set((state) => {

@@ -116,6 +116,48 @@ describe("useGapStore", () => {
     expect(state.gradeInput.percent).toBeCloseTo(10.05, 1);
   });
 
+  it("should cap vertical speed when it exceeds 50% grade", () => {
+    const { setVertSpeedInput, setSpeedInput, setInputUnit } =
+      useGapStore.getState();
+
+    // Set speed to 10 km/h (2.777... m/s)
+    setInputUnit("km/h");
+    setSpeedInput(10, 0);
+
+    // Max vert speed at 10km/h and 50% grade:
+    // grade = 0.5 -> theta = atan(0.5) = 26.565... degrees
+    // Vvert = Vtotal * sin(theta) = 2.777... * sin(26.565...) = 2.777... * 0.4472... = 1.2422... m/s
+    // Vvert (m/hr) = 1.2422... * 3600 = 4472.13... m/hr
+
+    // Set vert speed to 6000 m/hr (which is > 4472)
+    setVertSpeedInput(6000, "m/hr");
+
+    const state = useGapStore.getState();
+    expect(state.grade).toBe(0.5);
+    expect(state.gradeInput.percent).toBe(50);
+    expect(state.vertSpeedInput.value).toBeCloseTo(4472, -1);
+  });
+
+  it("should respect hill direction when setting vertical speed", () => {
+    const { setVertSpeedInput, setSpeedInput, setInputUnit, setHillDirection } =
+      useGapStore.getState();
+
+    setInputUnit("km/h");
+    setSpeedInput(10, 0);
+
+    // Set to downhill
+    setHillDirection("downhill");
+
+    // Set vert speed to 1000 m/hr
+    setVertSpeedInput(1000, "m/hr");
+
+    const state = useGapStore.getState();
+    // Since it's downhill, grade should be negative
+    expect(state.grade).toBeLessThan(0);
+    expect(state.gradeInput.percent).toBeCloseTo(-10.05, 1);
+    expect(state.hillDirection).toBe("downhill");
+  });
+
   it("should correctly convert speed from mph to km/h without decimal overflow", () => {
     const { setUnitSystem, setSpeedInput, setInputUnit } =
       useGapStore.getState();
