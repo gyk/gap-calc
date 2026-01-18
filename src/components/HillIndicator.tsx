@@ -1,11 +1,12 @@
 import { css, html } from "react-strict-dom";
+import type { HillDirectionUI } from "../types/gap";
 
 interface HillIndicatorProps {
-  isUphill: boolean;
+  direction: HillDirectionUI;
   onToggle?: () => void;
 }
 
-export function HillIndicator({ isUphill, onToggle }: HillIndicatorProps) {
+export function HillIndicator({ direction, onToggle }: HillIndicatorProps) {
   // <svg> element is not currently supported on native.
   // See https://github.com/facebook/react-strict-dom/issues/4
   return (
@@ -17,10 +18,22 @@ export function HillIndicator({ isUphill, onToggle }: HillIndicatorProps) {
         viewBox="0 0 100 80"
         style={styles.svg}
         role="img"
-        aria-label={isUphill ? "Uphill" : "Downhill"}
+        aria-label={
+          direction === "uphill"
+            ? "Uphill"
+            : direction === "downhill"
+              ? "Downhill"
+              : "Flat"
+        }
       >
-        <title>{isUphill ? "Uphill" : "Downhill"}</title>
-        {isUphill ? (
+        <title>
+          {direction === "uphill"
+            ? "Uphill"
+            : direction === "downhill"
+              ? "Downhill"
+              : "Flat"}
+        </title>
+        {direction === "uphill" ? (
           // Uphill mountain
           <polyline
             points="10,70 35,30 50,45 70,15 90,60"
@@ -28,7 +41,7 @@ export function HillIndicator({ isUphill, onToggle }: HillIndicatorProps) {
             strokeWidth="10"
             fill="none"
           />
-        ) : (
+        ) : direction === "downhill" ? (
           // Downhill mountain (flipped)
           <polyline
             points="10,15 30,45 45,35 60,60 80,60"
@@ -36,10 +49,22 @@ export function HillIndicator({ isUphill, onToggle }: HillIndicatorProps) {
             strokeWidth="8"
             fill="none"
           />
+        ) : (
+          // Flat line
+          <polyline
+            points="20,40 80,40"
+            stroke="#0056b3"
+            strokeWidth="8"
+            fill="none"
+          />
         )}
       </svg>
       <html.div style={styles.label}>
-        {isUphill ? "Uphill" : "Downhill"}
+        {direction === "uphill"
+          ? "Uphill"
+          : direction === "downhill"
+            ? "Downhill"
+            : "Flat"}
       </html.div>
     </html.div>
   );

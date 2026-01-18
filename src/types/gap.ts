@@ -14,6 +14,9 @@ export type UnitSystem = "metric" | "imperial" | "both";
 /** Hill direction */
 export type HillDirection = "uphill" | "downhill";
 
+/** Hill direction for UI purposes (includes flat state) */
+export type HillDirectionUI = "uphill" | "flat" | "downhill";
+
 /** Hill input mode - how the incline is specified */
 export type HillInputMode = "grade" | "angle" | "rise/run" | "vert speed";
 

@@ -14,6 +14,7 @@ import type {
   CalcMode,
   GapState,
   HillDirection,
+  HillDirectionUI,
   HillInputMode,
   PaceUnit,
   RiseUnit,
@@ -43,6 +44,7 @@ interface GapActions {
   applyPreset: (inclinePercent: number, speedMph: number) => void;
   toggleSectionCollapse: (section: "settings" | "speed" | "incline") => void;
   reset: () => void;
+  getHillDirectionUI: () => HillDirectionUI;
 }
 
 const MAX_GRADE = 0.5;
@@ -182,7 +184,7 @@ const convertInputValues = (
 
 export const useGapStore = create<GapState & GapActions>()(
   persist(
-    immer((set) => ({
+    immer((set, get) => ({
       ...initialState,
 
       setUnitSystem: (system) =>
@@ -417,6 +419,14 @@ export const useGapStore = create<GapState & GapActions>()(
         set((state) => {
           Object.assign(state, createInitialState());
         }),
+      getHillDirectionUI: () => {
+        const state = get();
+        // If grade is exactly 0, show "flat"
+        if (state.grade === 0) {
+          return "flat";
+        }
+        return state.hillDirection;
+      },
     })),
     {
       name: "gap-calc-storage",

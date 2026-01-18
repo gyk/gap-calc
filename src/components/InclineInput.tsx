@@ -23,11 +23,15 @@ export function InclineInput() {
     setRiseRunInput,
     setVertSpeedInput,
     setHillDirection,
+    getHillDirectionUI,
   } = useGapStore();
 
   const riseUnitOptions = getUnitOptions(unitSystem, ["meters"], ["feet"]);
   const runUnitOptions = getUnitOptions(unitSystem, ["km"], ["mi"]);
   const vertSpeedUnitOptions = getUnitOptions(unitSystem, ["m/hr"], ["ft/hr"]);
+
+  // Get UI direction (flat when grade === 0)
+  const hillDirectionUI = getHillDirectionUI();
 
   // Determine if uphill based on current input mode
   let isUphill = hillDirection === "uphill";
@@ -46,7 +50,7 @@ export function InclineInput() {
 
   const renderGradeInput = () => (
     <html.div style={isMobile ? styles.columnCenter : styles.gradeRow}>
-      <HillIndicator isUphill={isUphill} onToggle={toggleDirection} />
+      <HillIndicator direction={hillDirectionUI} onToggle={toggleDirection} />
       <GradeArrowButtons
         value={gradeInput.percent}
         onSmallIncrement={() => setGradeInput(gradeInput.percent + 1)}
@@ -71,7 +75,7 @@ export function InclineInput() {
 
     return (
       <html.div style={styles.row}>
-        <HillIndicator isUphill={isUphill} onToggle={toggleDirection} />
+        <HillIndicator direction={hillDirectionUI} onToggle={toggleDirection} />
         <html.div style={styles.dialRow}>
           <DigitDial
             label="Deg"
@@ -113,7 +117,10 @@ export function InclineInput() {
     return (
       <html.div style={styles.column}>
         <html.div style={styles.row}>
-          <HillIndicator isUphill={isUphill} onToggle={toggleDirection} />
+          <HillIndicator
+            direction={hillDirectionUI}
+            onToggle={toggleDirection}
+          />
           <html.div style={styles.riseRunContainer}>
             <html.div style={isMobile ? styles.columnCenter : styles.row}>
               <DigitDial
@@ -199,7 +206,10 @@ export function InclineInput() {
     return (
       <html.div style={styles.column}>
         <html.div style={styles.row}>
-          <HillIndicator isUphill={isUphill} onToggle={toggleDirection} />
+          <HillIndicator
+            direction={hillDirectionUI}
+            onToggle={toggleDirection}
+          />
           <html.div style={styles.dialRow}>
             <DigitDial
               label="100"
