@@ -1,4 +1,5 @@
 import { css, html } from "react-strict-dom";
+import { useLongPressRepeat } from "../hooks/useLongPressRepeat";
 
 interface DigitDialProps {
   value: number | string;
@@ -13,12 +14,15 @@ export function DigitDial({
   onDecrement,
   label,
 }: DigitDialProps) {
+  const incrementProps = useLongPressRepeat(onIncrement);
+  const decrementProps = useLongPressRepeat(onDecrement);
+
   return (
     <html.div style={styles.container}>
       {label && <html.div style={styles.label}>{label}</html.div>}
       <html.div style={styles.dialBox}>
         <html.button
-          onClick={onIncrement}
+          {...incrementProps}
           style={styles.button}
           aria-label="Increment"
         >
@@ -26,7 +30,7 @@ export function DigitDial({
         </html.button>
         <html.div style={styles.value}>{value}</html.div>
         <html.button
-          onClick={onDecrement}
+          {...decrementProps}
           style={styles.button}
           aria-label="Decrement"
         >

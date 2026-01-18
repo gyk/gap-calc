@@ -1,4 +1,5 @@
 import { css, html } from "react-strict-dom";
+import { useLongPressRepeat } from "../hooks/useLongPressRepeat";
 
 interface GradeArrowButtonsProps {
   value: number;
@@ -19,10 +20,13 @@ export function GradeArrowButtons({
   smallStep = 1,
   largeStep = 3,
 }: GradeArrowButtonsProps) {
+  const largeDecProps = useLongPressRepeat(onLargeDecrement);
+  const largeIncProps = useLongPressRepeat(onLargeIncrement);
+
   return (
     <html.div style={styles.container}>
       <html.button
-        onClick={onLargeDecrement}
+        {...largeDecProps}
         style={styles.button}
         aria-label={`Decrease grade by ${largeStep}`}
       >
@@ -47,7 +51,7 @@ export function GradeArrowButtons({
         ›
       </html.button>
       <html.button
-        onClick={onLargeIncrement}
+        {...largeIncProps}
         style={styles.button}
         aria-label={`Increase grade by ${largeStep}`}
       >
