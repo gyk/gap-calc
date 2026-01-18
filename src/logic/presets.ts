@@ -16,7 +16,7 @@ export const PRESETS: Preset[] = [
   {
     id: "default",
     name: "Default",
-    description: "Reset to default settings",
+    description: "⚠️ Reset all to default settings",
     inclinePercent: DEFAULT_INCLINE_PERCENT,
     speedMph: DEFAULT_SPEED_MPH,
   },

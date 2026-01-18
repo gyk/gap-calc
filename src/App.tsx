@@ -14,6 +14,7 @@ import type {
   PaceUnit,
   UnitSystem,
 } from "./types/gap";
+import { getUnitOptions } from "./utils/unitOptions";
 
 const HelpLink = ({
   href,
@@ -68,18 +69,16 @@ export default function App() {
       ? "speed"
       : "pace";
 
-  // Get filtered unit options based on unit system
-  const getInputUnitOptions = (): PaceUnit[] => {
-    if (unitSystem === "metric") return ["/km", "km/h"];
-    if (unitSystem === "imperial") return ["/mi", "mph"];
-    return ["/mi", "/km", "mph", "km/h"];
-  };
-
-  const getOutputUnitOptions = (): PaceUnit[] => {
-    if (unitSystem === "metric") return ["/km", "km/h"];
-    if (unitSystem === "imperial") return ["/mi", "mph"];
-    return ["/mi", "/km", "mph", "km/h"];
-  };
+  const inputUnitOptions = getUnitOptions(
+    unitSystem,
+    ["/km", "km/h"],
+    ["/mi", "mph"],
+  );
+  const outputUnitOptions = getUnitOptions(
+    unitSystem,
+    ["/km", "km/h"],
+    ["/mi", "mph"],
+  );
 
   const alerts = [];
   if (grade < -0.08) {
@@ -267,7 +266,7 @@ export default function App() {
             </html.div>
             {!collapsedSections.settings && (
               <UnitSelector<PaceUnit>
-                options={getInputUnitOptions()}
+                options={inputUnitOptions}
                 value={inputUnit}
                 onChange={setInputUnit}
               />
@@ -314,7 +313,7 @@ export default function App() {
             <html.div style={styles.sectionHeader}>
               <html.div style={styles.sectionTitle}>Output Unit</html.div>
               <UnitSelector<PaceUnit>
-                options={getOutputUnitOptions()}
+                options={outputUnitOptions}
                 value={outputUnit}
                 onChange={setOutputUnit}
               />
