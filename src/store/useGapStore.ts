@@ -9,7 +9,7 @@ import {
   convertSpeedToMS,
 } from "../logic/gapLogic";
 import { DEFAULT_GRADE, DEFAULT_SPEED_KMH } from "../logic/presets";
-import { KM_PER_MILE } from "../constants";
+import { KM_PER_MILE, METERS_PER_FOOT, METERS_PER_MILE } from "../constants";
 import type {
   CalcMode,
   GapState,
@@ -122,7 +122,7 @@ const syncVertSpeedFromGrade = (state: GapState) => {
   state.vertSpeedInput.value =
     state.vertSpeedInput.unit === "m/hr"
       ? Math.round(Math.abs(vertSpeedMS) * 3600)
-      : Math.round((Math.abs(vertSpeedMS) * 3600) / 0.3048);
+      : Math.round((Math.abs(vertSpeedMS) * 3600) / METERS_PER_FOOT);
 };
 
 const updateHillInputsFromGrade = (state: GapState) => {
@@ -134,12 +134,12 @@ const updateHillInputsFromGrade = (state: GapState) => {
 
   const runMeters =
     state.riseRunInput.runUnit === "mi"
-      ? state.riseRunInput.run * 1609.344
+      ? state.riseRunInput.run * METERS_PER_MILE
       : state.riseRunInput.run * 1000;
   const riseMeters = runMeters * grade;
   state.riseRunInput.rise =
     state.riseRunInput.riseUnit === "feet"
-      ? Math.round(riseMeters / 0.3048)
+      ? Math.round(riseMeters / METERS_PER_FOOT)
       : Math.round(riseMeters);
 
   state.hillDirection = grade >= 0 ? "uphill" : "downhill";
@@ -202,7 +202,7 @@ export const useGapStore = create<GapState & GapActions>()(
             // Convert vert speed
             if (state.vertSpeedInput.unit === "ft/hr") {
               state.vertSpeedInput.value = Math.round(
-                state.vertSpeedInput.value * 0.3048,
+                state.vertSpeedInput.value * METERS_PER_FOOT,
               );
               state.vertSpeedInput.unit = "m/hr";
             }
@@ -224,7 +224,7 @@ export const useGapStore = create<GapState & GapActions>()(
             // Convert vert speed
             if (state.vertSpeedInput.unit === "m/hr") {
               state.vertSpeedInput.value = Math.round(
-                state.vertSpeedInput.value / 0.3048,
+                state.vertSpeedInput.value / METERS_PER_FOOT,
               );
               state.vertSpeedInput.unit = "ft/hr";
             }
@@ -300,8 +300,9 @@ export const useGapStore = create<GapState & GapActions>()(
 
           // If units changed, convert values to keep grade the same
           if (state.riseRunInput.riseUnit !== riseUnit) {
-            if (riseUnit === "feet") newRise = Math.round(rise / 0.3048);
-            else newRise = Math.round(rise * 0.3048);
+            if (riseUnit === "feet")
+              newRise = Math.round(rise / METERS_PER_FOOT);
+            else newRise = Math.round(rise * METERS_PER_FOOT);
           }
           if (state.riseRunInput.runUnit !== runUnit) {
             if (runUnit === "mi")
@@ -319,11 +320,11 @@ export const useGapStore = create<GapState & GapActions>()(
             grade = grade < 0 ? -MAX_GRADE : MAX_GRADE;
             // Adjust rise to match MAX_GRADE
             const runMeters =
-              runUnit === "mi" ? newRun * 1609.344 : newRun * 1000;
+              runUnit === "mi" ? newRun * METERS_PER_MILE : newRun * 1000;
             const maxRiseMeters = runMeters * grade;
             newRise =
               riseUnit === "feet"
-                ? Math.round(maxRiseMeters / 0.3048)
+                ? Math.round(maxRiseMeters / METERS_PER_FOOT)
                 : Math.round(maxRiseMeters);
           }
 
@@ -339,14 +340,17 @@ export const useGapStore = create<GapState & GapActions>()(
         set((state) => {
           let newValue = Math.abs(value);
           if (state.vertSpeedInput.unit !== unit) {
-            if (unit === "ft/hr") newValue = Math.round(newValue / 0.3048);
-            else newValue = Math.round(newValue * 0.3048);
+            if (unit === "ft/hr")
+              newValue = Math.round(newValue / METERS_PER_FOOT);
+            else newValue = Math.round(newValue * METERS_PER_FOOT);
           }
           state.vertSpeedInput.unit = unit;
 
           const speedMS = getCurrentSpeedMS(state);
           let vertSpeedMS =
-            unit === "m/hr" ? newValue / 3600 : (newValue * 0.3048) / 3600;
+            unit === "m/hr"
+              ? newValue / 3600
+              : (newValue * METERS_PER_FOOT) / 3600;
 
           // Vertical speed should reflect the hill direction
           if (state.hillDirection === "downhill") {

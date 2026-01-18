@@ -1,5 +1,6 @@
 import type { EnergyColumn, HillDirection, PaceUnit } from "../types/gap";
 import { blackGam } from "./blackGam";
+import { METERS_PER_MILE, METERS_PER_FOOT, MPS_PER_MPH } from "../constants";
 
 /**
  * Linear interpolation between two points.
@@ -116,7 +117,7 @@ export function decimalPaceToString(paceDecimal: number): string {
  */
 export const convertDict: Record<PaceUnit, (speed: number) => string> = {
   "/mi": (speed) => {
-    const convDec = 1609.344 / (speed * 60);
+    const convDec = METERS_PER_MILE / (speed * 60);
     return decimalPaceToString(convDec);
   },
   "/km": (speed) => {
@@ -257,19 +258,19 @@ export function convertPaceToMS(
   const decMinutes = minutes + seconds / 60;
   if (decMinutes === 0) return 0;
   if (units === "/mi") {
-    return 1609.344 / (60 * decMinutes);
+    return METERS_PER_MILE / (60 * decMinutes);
   }
   if (units === "/km") {
     return 1000 / (60 * decMinutes);
   }
   // Fallback for speed units if called incorrectly
-  if (units === "mph") return (1 / decMinutes) * 0.44704 * 60; // This is weird but let's just handle it
+  if (units === "mph") return (1 / decMinutes) * MPS_PER_MPH * 60; // This is weird but let's just handle it
   return 0;
 }
 
 export function convertSpeedToMS(speed: number, units: PaceUnit): number {
   if (units === "mph") {
-    return (speed * 1609.344) / 3600;
+    return (speed * METERS_PER_MILE) / 3600;
   }
   if (units === "km/h") {
     return (speed * 1000) / 3600;
@@ -279,7 +280,7 @@ export function convertSpeedToMS(speed: number, units: PaceUnit): number {
   }
   // Fallback for pace units if called incorrectly
   if (units === "/km") return 1000 / (speed * 60);
-  if (units === "/mi") return 1609.344 / (speed * 60);
+  if (units === "/mi") return METERS_PER_MILE / (speed * 60);
   return 0;
 }
 
@@ -290,7 +291,7 @@ export function convertMSToPace(
   if (speedMS <= 0) return { minutes: 0, seconds: 0 };
   let paceDecimal = 0;
   if (unit === "/mi") {
-    paceDecimal = 1609.344 / (speedMS * 60);
+    paceDecimal = METERS_PER_MILE / (speedMS * 60);
   } else if (unit === "/km") {
     paceDecimal = 1000 / (speedMS * 60);
   } else {
@@ -305,7 +306,7 @@ export function convertMSToPace(
 
 export function convertMSToSpeed(speedMS: number, unit: PaceUnit): number {
   if (unit === "mph") {
-    return speedMS / 0.44704;
+    return speedMS / MPS_PER_MPH;
   }
   if (unit === "km/h") {
     return speedMS * 3.6;
@@ -318,7 +319,7 @@ export function convertMSToSpeed(speedMS: number, unit: PaceUnit): number {
 
 export function convertVertSpeedToMS(vertSpeed: number, units: string): number {
   if (units === "feet per hour" || units === "ft/hr") {
-    return (vertSpeed * 0.3048) / 3600;
+    return (vertSpeed * METERS_PER_FOOT) / 3600;
   }
   if (units === "meters per hour" || units === "m/hr") {
     return vertSpeed / 3600;
@@ -333,9 +334,11 @@ export function calculateGradeFromRiseRun(
   runUnit: string,
 ): number {
   const riseMeters =
-    riseUnit === "feet" || riseUnit === "ft" ? rise * 0.3048 : rise;
+    riseUnit === "feet" || riseUnit === "ft" ? rise * METERS_PER_FOOT : rise;
   const runMeters =
-    runUnit === "miles" || runUnit === "mi" ? run * 1609.344 : run * 1000;
+    runUnit === "miles" || runUnit === "mi"
+      ? run * METERS_PER_MILE
+      : run * 1000;
   return riseMeters / runMeters;
 }
 
