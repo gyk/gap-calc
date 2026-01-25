@@ -110,7 +110,7 @@ export default function App() {
     <html.div style={styles.container}>
       <html.div style={styles.card}>
         <html.h1 style={styles.title}>
-          <html.img src="/icon.svg" style={styles.logo} alt="App Icon" />
+          <html.img src="icon.svg" style={styles.logo} alt="App Icon" />
           <html.div style={styles.titleText}>
             <html.div>
               <html.span style={styles.titleGrade}>Grade-adjusted</html.span>
