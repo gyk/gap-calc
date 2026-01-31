@@ -1,14 +1,15 @@
 import { css, html } from "react-strict-dom";
 import { useIsMobile } from "../hooks/useIsMobile";
 import {
-  calculateGradeFromRiseRun,
   calculateMainResult,
   convertDict,
-  convertPaceToMS,
-  convertSpeedToMS,
   convertVertSpeedToMS,
 } from "../logic/gapLogic";
-import { useGapStore } from "../store/useGapStore";
+import {
+  getCurrentGrade,
+  getCurrentSpeedMS,
+  useGapStore,
+} from "../store/useGapStore";
 import type { PaceUnit } from "../types/gap";
 
 export function OutputDisplay() {
@@ -16,28 +17,9 @@ export function OutputDisplay() {
   const isMobile = useIsMobile();
 
   // 1. Convert inputs to standard units (m/s and decimal grade)
-  const speedMode =
-    state.inputUnit === "mph" ||
-    state.inputUnit === "km/h" ||
-    state.inputUnit === "m/s"
-      ? "speed"
-      : "pace";
+  const inputMS = getCurrentSpeedMS(state);
 
-  let inputMS = 0;
-  if (speedMode === "pace") {
-    inputMS = convertPaceToMS(
-      state.paceInput.minutes,
-      state.paceInput.tensSeconds * 10 + state.paceInput.onesSeconds,
-      state.inputUnit,
-    );
-  } else {
-    inputMS = convertSpeedToMS(
-      state.speedInput.whole + state.speedInput.decimal / 10,
-      state.inputUnit,
-    );
-  }
-
-  let inputGrade = state.grade;
+  const inputGrade = getCurrentGrade(state);
   let vertSpeedMS = 0;
 
   if (state.hillInputMode === "vert speed") {

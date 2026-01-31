@@ -7,6 +7,7 @@ import {
   convertMSToSpeed,
   convertPaceToMS,
   convertSpeedToMS,
+  convertVertSpeedToMS,
 } from "../logic/gapLogic";
 import { DEFAULT_GRADE, DEFAULT_SPEED_KMH } from "../logic/presets";
 import { KM_PER_MILE, METERS_PER_FOOT, METERS_PER_MILE } from "../constants";
@@ -70,6 +71,7 @@ const createInitialState = (): GapState => {
 
   return {
     unitSystem: INITIAL_UNIT_SYSTEM,
+    inputSpeedMS: initialSpeedMS,
     paceInput: {
       minutes: initialPace.minutes,
       tensSeconds: Math.floor(initialPace.seconds / 10),
@@ -104,7 +106,7 @@ const createInitialState = (): GapState => {
 
 const initialState: GapState = createInitialState();
 
-const getCurrentSpeedMS = (state: GapState) => {
+export const getCurrentSpeedMS = (state: GapState) => {
   if (state.inputUnit === "/km" || state.inputUnit === "/mi") {
     return convertPaceToMS(
       state.paceInput.minutes,
@@ -114,6 +116,61 @@ const getCurrentSpeedMS = (state: GapState) => {
   }
   const speed = state.speedInput.whole + state.speedInput.decimal / 10;
   return convertSpeedToMS(speed, state.inputUnit);
+};
+
+export const getCurrentGrade = (state: GapState) => {
+  if (state.hillInputMode === "grade") {
+    // UI displays rounded integer grade
+    return Math.round(state.gradeInput.percent) / 100;
+  }
+  if (state.hillInputMode === "angle") {
+    // UI displays 1 decimal place
+    const degrees = state.angleInput.degrees;
+    const whole = Math.floor(degrees);
+    const decimal = Math.round((degrees - whole) * 10);
+    const displayedDegrees = whole + decimal / 10;
+    return Math.tan((displayedDegrees * Math.PI) / 180);
+  }
+  if (state.hillInputMode === "rise/run") {
+    // Rise is integer (already rounded in store), Run is 1 decimal (if set via UI)
+    const run = state.riseRunInput.run;
+    const runWhole = Math.floor(run);
+    const runDecimal = Math.round((run - runWhole) * 10);
+    const displayedRun = runWhole + runDecimal / 10;
+
+    return calculateGradeFromRiseRun(
+      state.riseRunInput.rise,
+      displayedRun,
+      state.riseRunInput.riseUnit,
+      state.riseRunInput.runUnit,
+    );
+  }
+  if (state.hillInputMode === "vert speed") {
+    const vertSpeedMS = convertVertSpeedToMS(
+      state.vertSpeedInput.value,
+      state.vertSpeedInput.unit,
+    ); // value is integer in store (displayed value)
+    const speedMS = getCurrentSpeedMS(state); // Based on displayed speed
+
+    let signedVertSpeedMS = vertSpeedMS;
+    if (state.hillDirection === "downhill") {
+      signedVertSpeedMS = -signedVertSpeedMS;
+    }
+
+    if (speedMS <= 0) return 0;
+
+    if (Math.abs(signedVertSpeedMS) >= speedMS) {
+      return signedVertSpeedMS >= 0 ? MAX_GRADE : -MAX_GRADE;
+    }
+
+    const angleRad = Math.asin(signedVertSpeedMS / speedMS);
+    let grade = Math.tan(angleRad);
+    if (Math.abs(grade) > MAX_GRADE) {
+      grade = grade < 0 ? -MAX_GRADE : MAX_GRADE;
+    }
+    return grade;
+  }
+  return state.grade;
 };
 
 const syncVertSpeedFromGrade = (state: GapState) => {
@@ -147,35 +204,22 @@ const updateHillInputsFromGrade = (state: GapState) => {
 };
 
 const convertInputValues = (
-  state: any,
+  state: GapState,
   oldUnit: PaceUnit,
   newUnit: PaceUnit,
 ) => {
   if (oldUnit === newUnit) return;
 
-  // Get current speed in m/s
-  let speedMS = 0;
-  if (oldUnit === "/km" || oldUnit === "/mi") {
-    speedMS = convertPaceToMS(
-      state.paceInput.minutes,
-      state.paceInput.tensSeconds * 10 + state.paceInput.onesSeconds,
-      oldUnit,
-    );
-  } else {
-    const speed = state.speedInput.whole + state.speedInput.decimal / 10;
-    speedMS = convertSpeedToMS(speed, oldUnit);
-  }
-
   state.inputUnit = newUnit;
 
-  // Convert m/s to new unit and update inputs
+  // Convert canonical m/s to new unit and update inputs
   if (newUnit === "/km" || newUnit === "/mi") {
-    const { minutes, seconds } = convertMSToPace(speedMS, newUnit);
+    const { minutes, seconds } = convertMSToPace(state.inputSpeedMS, newUnit);
     state.paceInput.minutes = minutes;
     state.paceInput.tensSeconds = Math.floor(seconds / 10);
     state.paceInput.onesSeconds = seconds % 10;
   } else {
-    const speed = convertMSToSpeed(speedMS, newUnit);
+    const speed = convertMSToSpeed(state.inputSpeedMS, newUnit);
     const totalTenths = Math.round(speed * 10);
     state.speedInput.whole = Math.floor(totalTenths / 10);
     state.speedInput.decimal = totalTenths % 10;
@@ -245,6 +289,13 @@ export const useGapStore = create<GapState & GapActions>()(
           const remainingSeconds = totalSeconds % 60;
           state.paceInput.tensSeconds = Math.floor(remainingSeconds / 10);
           state.paceInput.onesSeconds = remainingSeconds % 10;
+          if (state.inputUnit === "/km" || state.inputUnit === "/mi") {
+            state.inputSpeedMS = convertPaceToMS(
+              state.paceInput.minutes,
+              state.paceInput.tensSeconds * 10 + state.paceInput.onesSeconds,
+              state.inputUnit,
+            );
+          }
           syncVertSpeedFromGrade(state);
         }),
       setSpeedInput: (whole, decimal) =>
@@ -252,6 +303,15 @@ export const useGapStore = create<GapState & GapActions>()(
           const totalTenths = whole * 10 + decimal;
           state.speedInput.whole = Math.floor(totalTenths / 10);
           state.speedInput.decimal = totalTenths % 10;
+          if (
+            state.inputUnit === "mph" ||
+            state.inputUnit === "km/h" ||
+            state.inputUnit === "m/s"
+          ) {
+            const speed =
+              state.speedInput.whole + state.speedInput.decimal / 10;
+            state.inputSpeedMS = convertSpeedToMS(speed, state.inputUnit);
+          }
           syncVertSpeedFromGrade(state);
         }),
       setInputUnit: (unit) =>
@@ -399,6 +459,8 @@ export const useGapStore = create<GapState & GapActions>()(
           const totalTenths = Math.round(targetSpeed * 10);
           state.speedInput.whole = Math.floor(totalTenths / 10);
           state.speedInput.decimal = totalTenths % 10;
+
+          state.inputSpeedMS = convertSpeedToMS(targetSpeed, targetUnit);
 
           syncVertSpeedFromGrade(state);
         }),

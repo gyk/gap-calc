@@ -1,7 +1,5 @@
 # gap-calc
 
-NOTE: We use `pnpm`, not `npm`.
-
 This project aims to reimplement _grade-adjusted pace calculator_ from Running Writings Apps in modern tech stack:
 
 - TypeScript (and Zod if needed)
@@ -10,6 +8,12 @@ This project aims to reimplement _grade-adjusted pace calculator_ from Running W
 - Zustand, Immer for state management
 - pnpm for package management
 - Biome for linting and formatting
+
+## Notes for tools
+
+- We use `pnpm`, not `npm`.
+- Use ripgrep (`rg`) when you need to search text.
+- If you have edited a lot of code, please run `pnpm format` to keep code style consistent.
 
 ## Notes
 

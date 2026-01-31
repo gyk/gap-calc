@@ -82,6 +82,7 @@ export interface GapState {
   unitSystem: UnitSystem;
 
   // Speed/pace input
+  inputSpeedMS: number;
   paceInput: PaceInput;
   speedInput: SpeedInput;
   inputUnit: PaceUnit;

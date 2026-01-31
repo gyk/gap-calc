@@ -60,6 +60,21 @@ describe("useGapStore", () => {
     expect(state.paceInput.onesSeconds).toBe(2);
   });
 
+  it("should preserve pace when switching units back", () => {
+    const { setPaceInput, setInputUnit } = useGapStore.getState();
+
+    setInputUnit("/km");
+    setPaceInput(15, 1, 0);
+
+    setInputUnit("km/h");
+    setInputUnit("/km");
+
+    const state = useGapStore.getState();
+    expect(state.paceInput.minutes).toBe(15);
+    expect(state.paceInput.tensSeconds).toBe(1);
+    expect(state.paceInput.onesSeconds).toBe(0);
+  });
+
   it("should cap grade at 50%", () => {
     const { setGradeInput } = useGapStore.getState();
     setGradeInput(60);
