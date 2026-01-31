@@ -3,14 +3,16 @@ import type { PointerEvent, MouseEvent } from "react";
 
 export function useLongPressRepeat(
   action: () => void,
-  delay = 500,
+  repeatDelay = 500,
   interval = 100,
+  pressDelay = 150,
 ) {
   const actionRef = useRef(action);
   actionRef.current = action;
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const startTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const stop = useCallback(() => {
     if (timerRef.current) {
@@ -21,6 +23,10 @@ export function useLongPressRepeat(
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+    if (startTimerRef.current) {
+      clearTimeout(startTimerRef.current);
+      startTimerRef.current = null;
+    }
   }, []);
 
   const start = useCallback(
@@ -28,16 +34,30 @@ export function useLongPressRepeat(
       if (e.button !== 0) return;
 
       stop();
-      actionRef.current();
 
-      timerRef.current = setTimeout(() => {
-        intervalRef.current = setInterval(() => {
-          actionRef.current();
-        }, interval);
-      }, delay);
+      startTimerRef.current = setTimeout(() => {
+        startTimerRef.current = null;
+        actionRef.current();
+
+        timerRef.current = setTimeout(
+          () => {
+            intervalRef.current = setInterval(() => {
+              actionRef.current();
+            }, interval);
+          },
+          Math.max(0, repeatDelay - pressDelay),
+        );
+      }, pressDelay);
     },
-    [delay, interval, stop],
+    [repeatDelay, interval, stop, pressDelay],
   );
+
+  const onPointerUp = useCallback(() => {
+    if (startTimerRef.current) {
+      actionRef.current();
+    }
+    stop();
+  }, [stop]);
 
   useEffect(() => {
     return stop;
@@ -49,7 +69,7 @@ export function useLongPressRepeat(
 
   return {
     onPointerDown: start,
-    onPointerUp: stop,
+    onPointerUp,
     onPointerLeave: stop,
     onPointerCancel: stop,
     onContextMenu,
