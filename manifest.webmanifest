@@ -1,0 +1,1 @@
+{"name":"GAP Calculator","short_name":"GAP Calc","description":"Grade Adjusted Pace Calculator","start_url":"/gap-calc/","display":"standalone","background_color":"#ffffff","theme_color":"#007bff","lang":"en","scope":"/gap-calc/","icons":[{"src":"icon.svg","sizes":"192x192 512x512","type":"image/svg+xml","purpose":"any maskable"}]}
